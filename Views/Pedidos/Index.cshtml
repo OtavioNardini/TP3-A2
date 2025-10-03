@@ -1,0 +1,39 @@
+﻿@model IEnumerable<RestauranteAPP_TP3.Models.Pedido>
+
+@{
+    ViewData["Title"] = "Lista de Pedidos";
+}
+
+<h2>Lista de Pedidos</h2>
+<hr />
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Data</th>
+            <th>Cliente</th>
+            <th>Itens</th>
+            <th>Valor Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var pedido in Model)
+        {
+            <tr>
+                <td>@pedido.Data</td>
+                <td>@pedido.Usuario?.Nome</td>
+                <td>
+                    <ul>
+                        @foreach (var pi in pedido.PedidoItens)
+                        {
+                            <li>@pi.ItemCardapio.Nome (Qtd: @pi.Quantidade)</li>
+                        }
+                    </ul>
+                </td>
+                <td>@pedido.ValorTotal.ToString("C")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="Create" class="btn btn-success">Novo Pedido</a>

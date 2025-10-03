@@ -1,0 +1,46 @@
+﻿@model IEnumerable<RestauranteAPP_TP3.Models.ItemCardapio>
+
+@{
+    ViewData["Title"] = "Página Inicial";
+}
+<div class="text-center">
+    <h1 class="display-4">🍽 Bem-vindo ao RestauranteAPP</h1>
+    <p class="lead">Faça seu pedido, consulte o cardápio e reserve mesas para o jantar.</p>
+</div>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <h3>👉 Sugestão do Chefe (Hoje)</h3>
+
+        <div class="row">
+            @if (Model != null && Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <div class="col-md-4">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">@item.Nome</h5>
+                                <p class="card-text">@item.Descricao</p>
+                                <p><strong>Preço:</strong> R$ @item.PrecoBase.ToString("F2")</p>
+                                <a asp-controller="Pedidos" asp-action="Create" asp-route-id="@item.Id"
+                                   class="btn btn-success">Pedir Agora</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12">
+                    <div class="alert alert-info text-center" role="alert">
+                        Nenhuma sugestão do chefe disponível no momento.
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="col-md-6"> <h3>📋 Acesso Rápido</h3> <ul class="list-group"> <li class="list-group-item"> <a asp-controller="Cardapio" asp-action="Index">Ver Cardápio</a> </li> <li class="list-group-item"> <a asp-controller="Pedidos" asp-action="Create">Fazer Pedido</a> </li> <li class="list-group-item"> <a asp-controller="Reservas" asp-action="Create">Reservar Mesa</a> </li> <li class="list-group-item"> <a asp-controller="Relatorios" asp-action="Index">Ver Relatórios</a> </li> </ul> </div>
+</div>
