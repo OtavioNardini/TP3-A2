@@ -431,5 +431,4 @@ C:\Users\otavi\source\repos\RestauranteAPP-TP3\RestauranteAPP-TP3\bin\Debug\net9
 C:\Users\otavi\source\repos\RestauranteAPP-TP3\RestauranteAPP-TP3\bin\Debug\net9.0\runtimes\win-arm64\native\e_sqlite3.dll
 C:\Users\otavi\source\repos\RestauranteAPP-TP3\RestauranteAPP-TP3\bin\Debug\net9.0\runtimes\win-x64\native\e_sqlite3.dll
 C:\Users\otavi\source\repos\RestauranteAPP-TP3\RestauranteAPP-TP3\bin\Debug\net9.0\runtimes\win-x86\native\e_sqlite3.dll
-C:\Users\otavi\source\repos\RestauranteAPP-TP3\RestauranteAPP-TP3\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt
 C:\Users\otavi\source\repos\RestauranteAPP-TP3\RestauranteAPP-TP3\obj\Debug\net9.0\RestauranteAPP-TP3.sourcelink.json
