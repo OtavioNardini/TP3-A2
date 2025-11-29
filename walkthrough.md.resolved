@@ -1,0 +1,400 @@
+# Refatoração do Projeto - Resumo Completo
+
+## ✅ Alterações Realizadas
+
+### 1. **Estrutura de Entidades (Models)**
+Criadas **20 entidades** de acordo com o diagrama UML em `Models/`:
+
+- **Usuário e Autenticação**: `Usuario`, `Role`
+- **Organização**: `Organizacao`, `CentroCusto`, `RegraAprovacao`
+- **Fornecedor**: `Fornecedor`, `DocumentoFornecedor`, `CertificadoCompliance`
+- **Produto/Serviço**: [ProdutoServico](file:///c:/Users/otavi/Facul/2025_02/TP3/TP3-A2/Controllers/ProdutoServicoController.cs#69-73), `Catalogo`, `ItemCatalogo`
+- **Pedidos**: [Pedido](file:///c:/Users/otavi/Facul/2025_02/TP3/TP3-A2/Controllers/PedidoController.cs#69-73), [ItemPedido](file:///c:/Users/otavi/Facul/2025_02/TP3/TP3-A2/Controllers/ItemPedidoController.cs#4-48), [Aprovacao](file:///c:/Users/otavi/Facul/2025_02/TP3/TP3-A2/Controllers/AprovacaoController.cs#4-50), `PropostaFornecedor`
+- **Financeiro**: `LancamentoFinanceiro`
+- **Sistema**: `Endereco`, `Notificacao`, `LogAuditoria`, `TerritorialIBGE`
+
+### 2. **ASP.NET Core Identity Configurado**
+
+#### Usuário e Role com Integer Keys
+```csharp
+// Usuario herda de IdentityUser<int>
+public class Usuario : IdentityUser<int>
+{
+    public string Nome { get; set; }
+    public int? OrgId { get; set; }
+    public int? FornecedorId { get; set; }
+    public DateTime? LastLogin { get; set; }
+}
+
+// Role herda de IdentityRole<int>
+public class Role : IdentityRole<int> { }
+```
+
+#### DbContext Atualizado
+```csharp
+public class PlataformaB2B_A2_TP3Context : IdentityDbContext<Usuario, Role, int>
+{
+    // Todos os DbSets configurados
+    public DbSet<Pedido> Pedidos { get; set; }
+    public DbSet<ProdutoServico> ProdutosServicos { get; set; }
+    // ... etc
+}
+```
+
+### 3. **Configuração no Program.cs**
+
+#### Identity e JWT
+```csharp
+builder.Services.AddIdentity<Usuario, Role>(options => {
+    options.Password.RequireDigit = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequiredLength = 6;
+})
+.AddEntityFrameworkStores<PlataformaB2B_A2_TP3Context>()
+.AddDefaultTokenProviders();
+
+builder.Services.AddAuthentication(...)
+    .AddJwtBearer(...);
+```
+
+#### Roles Seeded Automaticamente
+- **Administrador**
+- **Comprador**
+- **Aprovador**
+- **Fornecedor**
+
+#### Admin Default
+- Email: `admin@local` (configurável em appsettings.json)
+- Senha: `Admin123!` (configurável em appsettings.json)
+
+### 4. **Controllers Implementados**
+
+#### PedidoController (EF Core)
+```csharp
+[ApiController]
+[Route("api/[controller]")]
+public class PedidoController : ControllerBase
+{
+    private readonly PlataformaB2B_A2_TP3Context _context;
+    
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<Pedido>>> Get()
+    
+    [HttpGet("{id}")]
+    [HttpPost]
+    [HttpPut("{id}")]
+    [HttpDelete("{id}")]
+}
+```
+
+#### ProdutoServicoController (EF Core)
+Similar ao PedidoController, com operações CRUD completas.
+
+#### HomeController
+Mantido para MVC views.
+
+### 5. **Pacotes NuGet Adicionados**
+- `Microsoft.AspNetCore.Identity.EntityFrameworkCore` (9.0.0)
+- `Microsoft.AspNetCore.Identity.UI` (9.0.0)
+- `Microsoft.AspNetCore.Authentication.JwtBearer` (9.0.0)
+- `Microsoft.EntityFrameworkCore.SqlServer` (9.0.0)
+- `Microsoft.EntityFrameworkCore.Tools` (9.0.0)
+
+---
+
+## 📋 Como Usar
+
+### **Passo 1: Configurar Connection String**
+
+Edite [appsettings.json](file:///c:/Users/otavi/Facul/2025_02/TP3/TP3-A2/appsettings.json):
+
+```json
+{
+  "ConnectionStrings": {
+    "PlataformaB2B_A2_TP3Context": "Server=(localdb)\\mssqllocaldb;Database=PlataformaB2B;Trusted_Connection=True;MultipleActiveResultSets=true"
+  },
+  "Jwt": {
+    "Key": "SUA_CHAVE_SECRETA_MUITO_LONGA_E_SEGURA_AQUI",
+    "Issuer": "PlataformaB2B",
+    "Audience": "PlataformaB2B"
+  },
+  "AdminUser": {
+    "Email": "admin@plataforma.com",
+    "Password": "Admin@123456"
+  }
+}
+```
+
+### **Passo 2: Criar Migration Inicial**
+
+```powershell
+dotnet ef migrations add InitialCreate
+```
+
+### **Passo 3: Atualizar Banco de Dados**
+
+```powershell
+dotnet ef database update
+```
+
+Isso irá:
+- Criar todas as tabelas
+- Criar tabelas do Identity
+- Seed das roles (Administrador, Comprador, Aprovador, Fornecedor)
+- Criar usuário admin
+
+### **Passo 4: Executar o Projeto**
+
+```powershell
+dotnet run
+```
+
+### **Passo 5: Acessar Swagger**
+
+Navegue para: `https://localhost:5001/swagger` (ou porta configurada)
+
+### **Passo 6: Testar API**
+
+#### Exemplo: Criar Pedido
+```json
+POST /api/Pedido
+{
+  "compradorId": 1,
+  "orgId": 1,
+  "total": 1500.00,
+  "status": "Pendente",
+  "dataCriacao": "2025-11-29T00:00:00"
+}
+```
+
+---
+
+## 🎯 Próximos Passos Recomendados
+
+### **1. Implementar Autenticação JWT (PRIORITÁRIO)**
+
+#### Criar AuthController
+```csharp
+[ApiController]
+[Route("api/[controller]")]
+public class AuthController : ControllerBase
+{
+    private readonly UserManager<Usuario> _userManager;
+    private readonly SignInManager<Usuario> _signInManager;
+    
+    [HttpPost("login")]
+    public async Task<IActionResult> Login(LoginModel model)
+    {
+        // Implementar login e geração de JWT token
+    }
+    
+    [HttpPost("register")]
+    public async Task<IActionResult> Register(RegisterModel model)
+    {
+        // Implementar registro de usuário
+    }
+}
+```
+
+### **2. Adicionar Autorização aos Controllers**
+
+```csharp
+[Authorize(Roles = "Administrador,Comprador")]
+[HttpPost]
+public async Task<ActionResult<Pedido>> Post(Pedido pedido)
+```
+
+### **3. Implementar Controllers Faltantes**
+
+Criar controllers para:
+- `OrganizacaoController`
+- `FornecedorController`
+- `CatalogoController`
+- [AprovacaoController](file:///c:/Users/otavi/Facul/2025_02/TP3/TP3-A2/Controllers/AprovacaoController.cs#4-50)
+- `NotificacaoController`
+
+### **4. Adicionar Validações**
+
+Usar Data Annotations:
+```csharp
+public class Pedido
+{
+    [Required]
+    [Range(0.01, double.MaxValue)]
+    public decimal Total { get; set; }
+    
+    [Required]
+    [MaxLength(50)]
+    public string Status { get; set; }
+}
+```
+
+### **5. Implementar DTOs (Data Transfer Objects)**
+
+Criar pasta `DTOs/` com:
+- `PedidoCreateDto`
+- `PedidoUpdateDto`
+- `PedidoReadDto`
+
+Usar AutoMapper para conversão.
+
+### **6. Adicionar Paginação**
+
+```csharp
+[HttpGet]
+public async Task<ActionResult<IEnumerable<Pedido>>> Get(
+    [FromQuery] int pageNumber = 1,
+    [FromQuery] int pageSize = 10)
+{
+    return await _context.Pedidos
+        .Skip((pageNumber - 1) * pageSize)
+        .Take(pageSize)
+        .ToListAsync();
+}
+```
+
+### **7. Implementar Filtros e Busca**
+
+```csharp
+[HttpGet]
+public async Task<ActionResult<IEnumerable<Pedido>>> Get(
+    [FromQuery] string status = null,
+    [FromQuery] DateTime? dataInicio = null)
+{
+    var query = _context.Pedidos.AsQueryable();
+    
+    if (!string.IsNullOrEmpty(status))
+        query = query.Where(p => p.Status == status);
+        
+    if (dataInicio.HasValue)
+        query = query.Where(p => p.DataCriacao >= dataInicio);
+        
+    return await query.ToListAsync();
+}
+```
+
+### **8. Melhorar Documentação Swagger**
+
+Adicionar XML comments:
+```csharp
+/// <summary>
+/// Cria um novo pedido
+/// </summary>
+/// <param name="pedido">Dados do pedido</param>
+/// <returns>Pedido criado</returns>
+/// <response code="201">Pedido criado com sucesso</response>
+/// <response code="400">Dados inválidos</response>
+[HttpPost]
+[ProducesResponseType(StatusCodes.Status201Created)]
+[ProducesResponseType(StatusCodes.Status400BadRequest)]
+public async Task<ActionResult<Pedido>> Post(Pedido pedido)
+```
+
+### **9. Implementar Relacionamentos nas Queries**
+
+Usar `.Include()` para carregar relacionamentos:
+```csharp
+[HttpGet("{id}")]
+public async Task<ActionResult<Pedido>> Get(int id)
+{
+    var pedido = await _context.Pedidos
+        .Include(p => p.Comprador)
+        .Include(p => p.Organizacao)
+        .Include(p => p.Itens)
+            .ThenInclude(i => i.ItemCatalogo)
+        .FirstOrDefaultAsync(p => p.Id == id);
+        
+    return pedido is null ? NotFound() : pedido;
+}
+```
+
+### **10. Adicionar Tratamento de Erros Global**
+
+```csharp
+// Middleware personalizado
+app.UseExceptionHandler("/error");
+```
+
+### **11. Implementar Testes Unitários**
+
+Criar projeto de testes:
+```powershell
+dotnet new xunit -n PlataformaB2B.Tests
+```
+
+### **12. Configurar CORS (se necessário)**
+
+```csharp
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        builder => builder
+            .WithOrigins("http://localhost:3000")
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+});
+```
+
+---
+
+## 🔍 Estrutura Final do Projeto
+
+```
+PlataformaB2B-A2-TP3/
+├── Controllers/
+│   ├── AuthController.cs (criar)
+│   ├── HomeController.cs
+│   ├── PedidoController.cs ✅
+│   └── ProdutoServicoController.cs ✅
+├── Data/
+│   └── PlataformaB2B_A2_TP3Context.cs ✅
+├── Models/
+│   ├── Aprovacao.cs ✅
+│   ├── Catalogo.cs ✅
+│   ├── CentroCusto.cs ✅
+│   ├── Endereco.cs ✅
+│   ├── Fornecedor.cs ✅
+│   ├── ItemCatalogo.cs ✅
+│   ├── ItemPedido.cs ✅
+│   ├── LancamentoFinanceiro.cs ✅
+│   ├── LogAuditoria.cs ✅
+│   ├── Notificacao.cs ✅
+│   ├── Organizacao.cs ✅
+│   ├── Pedido.cs ✅
+│   ├── ProdutoServico.cs ✅
+│   ├── PropostaFornecedor.cs ✅
+│   ├── RegraAprovacao.cs ✅
+│   ├── Role.cs ✅
+│   ├── TerritorialIBGE.cs ✅
+│   └── Usuario.cs ✅
+├── Program.cs ✅
+└── appsettings.json
+```
+
+---
+
+## ⚠️ Avisos Importantes
+
+1. **Nullable Warnings**: O projeto tem 82 warnings de nullable. Para produção, considere adicionar validações ou tornar propriedades nullable (`string?`).
+
+2. **Chave Secreta JWT**: NUNCA commite a chave secreta real no Git. Use User Secrets ou variáveis de ambiente:
+   ```powershell
+   dotnet user-secrets set "Jwt:Key" "SuaChaveSecretaAqui"
+   ```
+
+3. **Migrations**: Sempre crie uma nova migration após mudar entidades:
+   ```powershell
+   dotnet ef migrations add NomeDaMudanca
+   dotnet ef database update
+   ```
+
+4. **Composite Keys**: [ItemPedido](file:///c:/Users/otavi/Facul/2025_02/TP3/TP3-A2/Controllers/ItemPedidoController.cs#4-48) usa chave composta (PedidoId + ItemCatalogoId). Isso está configurado no DbContext.
+
+---
+
+## 📚 Recursos Úteis
+
+- [ASP.NET Core Identity](https://docs.microsoft.com/aspnet/core/security/authentication/identity)
+- [Entity Framework Core](https://docs.microsoft.com/ef/core/)
+- [JWT Authentication](https://docs.microsoft.com/aspnet/core/security/authentication/jwt-authn)
+- [Swagger/OpenAPI](https://docs.microsoft.com/aspnet/core/tutorials/web-api-help-pages-using-swagger)

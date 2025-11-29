@@ -1,0 +1,244 @@
+@startuml ProjetoA2Completo
+
+title Plataforma B2B - Arquitetura Completa com API
+
+note top
+  **IMPLEMENTAÇÃO COMPLETA**
+  ✅ 20 Entidades de domínio
+  ✅ 11 Controllers RESTful
+  ✅ 8 Arquivos de DTOs
+  ✅ Autenticação JWT
+  ✅ Swagger funcional
+end note
+
+' ========== API CONTROLLERS ==========
+package "API Controllers (RESTful)" #LightBlue {
+  class "AuthController" as Auth << (C,orchid) >> {
+    + POST /api/Auth/register
+    + POST /api/Auth/login
+    --
+    Registra e autentica usuários
+    Retorna JWT token
+  }
+  
+  class "PedidosController" as PedidoAPI << (C,orchid) >> {
+    + GET, POST, PUT, DELETE
+    --
+    CRUD completo com DTOs
+    Include: Comprador, Organizacao
+  }
+  
+  class "ProdutosServicosController" as ProdutoAPI << (C,orchid) >> {
+    + GET, POST, PUT, DELETE
+    --
+    CRUD completo com DTOs
+    Include: Fornecedor
+  }
+  
+  class "OrganizacoesController" as OrgAPI << (C,orchid) >>
+  class "FornecedoresController" as FornAPI << (C,orchid) >>
+  class "CatalogosController" as CatAPI << (C,orchid) >>
+  class "AprovacoesController" as AprAPI << (C,orchid) >>
+  class "EnderecosController" as EndAPI << (C,orchid) >>
+  class "CentrosCustoController" as CCAPI << (C,orchid) >>
+  class "LancamentosFinanceirosController" as LanAPI << (C,orchid) >>
+  class "NotificacoesController" as NotAPI << (C,orchid) >>
+}
+
+' ========== DTOs ==========
+package "DTOs (Data Transfer Objects)" #LightGreen {
+  note "Padrão para todos:\n• CreateDto - validações\n• UpdateDto - campos opcionais\n• ReadDto - dados + relacionamentos" as dtoNote
+  
+  class PedidoDTOs {
+    PedidoCreateDto
+    PedidoUpdateDto
+    PedidoReadDto
+  }
+  
+  class AuthDTOs {
+    RegisterDto
+    LoginDto
+    AuthResponseDto
+  }
+  
+  class OutrosDTOs {
+    + Produto/Serviço
+    + Organização
+    + Fornecedor
+    + Catálogo
+    + ItemCatalogo
+    + Aprovação
+    + Endereço
+    + CentroCusto
+    + LancamentoFinanceiro
+    + Notificação
+  }
+}
+
+' ========== DOMAIN MODELS ==========
+package "Domain Models (EF Core)" #LightYellow {
+  
+  ' Identidade
+  class Usuario {
+    +id: int
+    +nome: string
+    +email: string
+    +org_id: int?
+    +fornecedor_id: int?
+    +last_login: DateTime?
+    --
+    Herda: IdentityUser<int>
+  }
+  
+  class Role {
+    +id: int
+    +name: string
+    --
+    Herda: IdentityRole<int>
+    Roles: Administrador,
+    Comprador, Aprovador, Fornecedor
+  }
+  
+  ' Core Business
+  class Organizacao {
+    +id: int
+    +nome: string
+    +cnpj: string
+  }
+  
+  class Fornecedor {
+    +id: int
+    +razao_social: string
+    +cnpj: string
+    +status_KYC: string
+    +certificacoes: string
+  }
+  
+  class ProdutoServico {
+    +id: int
+    +sku: string
+    +descricao: string
+    +unidade: string
+    +categoria: string
+    +fornecedor_id: int
+  }
+  
+  class Catalogo {
+    +id: int
+    +nome: string
+    +organizacao_id: int
+  }
+  
+  class ItemCatalogo {
+    +id: int
+    +catalogo_id: int
+    +produto_id: int
+    +preco: decimal
+    +disponivel: bool
+  }
+  
+  class Pedido {
+    +id: int
+    +comprador_id: int
+    +org_id: int
+    +total: decimal
+    +status: string
+    +data_criacao: DateTime
+    +endereco_entrega_id: int?
+    +centro_custo_id: int?
+  }
+  
+  class ItemPedido {
+    +pedido_id: int [PK]
+    +item_catalogo_id: int [PK]
+    +quantidade: decimal
+    +preco_unitario: decimal
+    --
+    Chave composta
+  }
+  
+  class Aprovacao {
+    +id: int
+    +pedido_id: int
+    +aprovador_id: int
+    +status: string
+    +comentario: string
+    +data: DateTime
+  }
+  
+  ' Suporte
+  class Endereco {
+    +id: int
+    +cep: string
+    +logradouro: string
+    +numero: string
+    +municipio_id: int
+  }
+  
+  class CentroCusto {
+    +id: int
+    +codigo: string
+    +descricao: string
+    +org_id: int
+  }
+  
+  class LancamentoFinanceiro {
+    +id: int
+    +pedido_id: int
+    +valor: decimal
+    +tipo: string
+    +status: string
+  }
+  
+  class Notificacao {
+    +id: int
+    +tipo: string
+    +destinatario_id: int
+    +lida: bool
+    +payload: string
+  }
+}
+
+' ========== RELACIONAMENTOS PRINCIPAIS ==========
+Usuario "1" -- "*" Pedido : cria
+Usuario "*" -- "*" Role : possui
+Usuario "1" -- "*" Notificacao : recebe
+Usuario "*" -- "0..1" Organizacao : pertence_a
+Usuario "*" -- "0..1" Fornecedor : pertence_a
+
+Organizacao "1" -- "*" Pedido : realiza
+Organizacao "1" -- "*" Catalogo : possui
+Organizacao "1" -- "*" CentroCusto : possui
+
+Fornecedor "1" -- "*" ProdutoServico : oferece
+
+Catalogo "1" -- "*" ItemCatalogo : contém
+ItemCatalogo "*" -- "1" ProdutoServico : referencia
+
+Pedido "1" -- "*" ItemPedido : contém
+Pedido "1" -- "*" Aprovacao : requer
+Pedido "1" -- "0..1" LancamentoFinanceiro : gera
+Pedido "*" -- "0..1" Endereco : entrega_em
+Pedido "*" -- "0..1" CentroCusto : alocado_em
+
+ItemPedido "*" -- "1" ItemCatalogo : referencia
+
+Aprovacao "*" -- "1" Usuario : aprovador
+
+' ========== FLUXO API ==========
+note bottom of Auth
+  1. Cliente chama POST /api/Auth/login
+  2. AuthController valida LoginDto
+  3. Gera JWT token com claims
+  4. Retorna AuthResponseDto
+end note
+
+note bottom of PedidoAPI
+  1. Cliente envia PedidoCreateDto
+  2. Controller valida e mapeia
+  3. Salva Pedido no DbContext
+  4. Include relacionamentos
+  5. Retorna PedidoReadDto
+end note
+
+@enduml
