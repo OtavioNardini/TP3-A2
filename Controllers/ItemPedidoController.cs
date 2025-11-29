@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using PlataformaB2B_A2_TP3.Domain.Entities;
+using PlataformaB2B_A2_TP3.Models;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -31,7 +31,6 @@ public class ItemPedidoController : ControllerBase
         var existing = itens.FirstOrDefault(i => i.Id == id);
         if (existing is null) return NotFound();
         existing.PedidoId = item.PedidoId;
-        existing.ProdutoId = item.ProdutoId;
         existing.Quantidade = item.Quantidade;
         existing.PrecoUnitario = item.PrecoUnitario;
         return NoContent();

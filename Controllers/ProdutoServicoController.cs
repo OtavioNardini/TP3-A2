@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PlataformaB2B_A2_TP3.Data;
-using PlataformaB2B_A2_TP3.Domain.Entities;
+using PlataformaB2B_A2_TP3.Models;
 
 [ApiController]
 [Route("api/[controller]")]

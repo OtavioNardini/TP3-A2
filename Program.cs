@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using PlataformaB2B_A2_TP3.Data;
-using PlataformaB2B_A2_TP3.Domain.Entities;
+using PlataformaB2B_A2_TP3.Models;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);

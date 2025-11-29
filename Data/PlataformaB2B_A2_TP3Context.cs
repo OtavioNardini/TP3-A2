@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using PlataformaB2B_A2_TP3.Domain.Entities;
+using PlataformaB2B_A2_TP3.Models;
 
 namespace PlataformaB2B_A2_TP3.Data
 {
