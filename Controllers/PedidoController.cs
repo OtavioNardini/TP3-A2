@@ -1,48 +1,73 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using PlataformaB2B_A2_TP3.Data;
+using PlataformaB2B_A2_TP3.Domain.Entities;
 
 [ApiController]
 [Route("api/[controller]")]
 public class PedidoController : ControllerBase
 {
-    private static List<Pedido> pedidos = new();
+    private readonly PlataformaB2B_A2_TP3Context _context;
+
+    public PedidoController(PlataformaB2B_A2_TP3Context context)
+    {
+        _context = context;
+    }
 
     [HttpGet]
-    public ActionResult<IEnumerable<Pedido>> Get() => pedidos;
+    public async Task<ActionResult<IEnumerable<Pedido>>> Get()
+    {
+        return await _context.Pedidos.ToListAsync();
+    }
 
     [HttpGet("{id}")]
-    public ActionResult<Pedido> Get(int id)
+    public async Task<ActionResult<Pedido>> Get(int id)
     {
-        var pedido = pedidos.FirstOrDefault(p => p.Id == id);
+        var pedido = await _context.Pedidos.FindAsync(id);
         return pedido is null ? NotFound() : pedido;
     }
 
     [HttpPost]
-    public ActionResult<Pedido> Post(Pedido pedido)
+    public async Task<ActionResult<Pedido>> Post(Pedido pedido)
     {
-        pedido.Id = pedidos.Count > 0 ? pedidos.Max(p => p.Id) + 1 : 1;
-        pedidos.Add(pedido);
+        _context.Pedidos.Add(pedido);
+        await _context.SaveChangesAsync();
         return CreatedAtAction(nameof(Get), new { id = pedido.Id }, pedido);
     }
 
     [HttpPut("{id}")]
-    public IActionResult Put(int id, Pedido pedido)
+    public async Task<IActionResult> Put(int id, Pedido pedido)
     {
-        var existing = pedidos.FirstOrDefault(p => p.Id == id);
-        if (existing is null) return NotFound();
-        existing.CompradorId = pedido.CompradorId;
-        existing.OrgId = pedido.OrgId;
-        existing.Total = pedido.Total;
-        existing.Status = pedido.Status;
-        existing.DataCriacao = pedido.DataCriacao;
+        if (id != pedido.Id) return BadRequest();
+
+        _context.Entry(pedido).State = EntityState.Modified;
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!PedidoExists(id)) return NotFound();
+            else throw;
+        }
+
         return NoContent();
     }
 
     [HttpDelete("{id}")]
-    public IActionResult Delete(int id)
+    public async Task<IActionResult> Delete(int id)
     {
-        var pedido = pedidos.FirstOrDefault(p => p.Id == id);
+        var pedido = await _context.Pedidos.FindAsync(id);
         if (pedido is null) return NotFound();
-        pedidos.Remove(pedido);
+
+        _context.Pedidos.Remove(pedido);
+        await _context.SaveChangesAsync();
         return NoContent();
+    }
+
+    private bool PedidoExists(int id)
+    {
+        return _context.Pedidos.Any(e => e.Id == id);
     }
 }

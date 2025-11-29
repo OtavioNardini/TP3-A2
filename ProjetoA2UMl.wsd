@@ -1,0 +1,194 @@
+@startuml
+
+package "Entidades Principais" {
+    class Usuario {
+        +id: Integer
+        +nome: String
+        +email: String
+        +org_id: Integer
+        +fornecedor_id: Integer
+        +last_login: DateTime
+    }
+
+    class Role {
+        +id: Integer
+        +name: String
+        +normalized_name: String
+    }
+
+    class Organizacao {
+        +id: Integer
+        +nome: String
+        +cnpj: String
+    }
+
+    class Fornecedor {
+        +id: Integer
+        +razao_social: String
+        +cnpj: String
+        +status_kYC: String
+        +certificacoes: List<String>
+    }
+
+    class Endereco {
+        +id: Integer
+        +cep: String
+        +logradouro: String
+        +numero: String
+        +complemento: String
+        +bairro: String
+        +municipio_id: Integer
+        +uf: String
+    }
+
+    class DocumentoFornecedor {
+        +id: Integer
+        +tipo: String
+        +arquivo: Blob
+        +fornecedor_id: Integer
+    }
+
+    class ProdutoServico {
+        +sku: String
+        +descricao: String
+        +unidade: String
+        +categoria: String
+        +fornecedor_id: Integer
+    }
+
+    class Catalogo {
+        +id: Integer
+        +organizacao_id: Integer
+        +nome: String
+    }
+
+    class ItemCatalogo {
+        +id: Integer
+        +catalogo_id: Integer
+        +produto_id: Integer
+        +preco: Decimal
+        +disponivel: Boolean
+    }
+
+    class Pedido {
+        +id: Integer
+        +comprador_id: Integer
+        +org_id: Integer
+        +total: Decimal
+        +status: String
+        +data_criacao: DateTime
+        +endereco_entrega_id: Integer
+    }
+
+    class ItemPedido {
+        +pedido_id: Integer
+        +item_catalogo_id: Integer
+        +quantidade: Decimal
+        +preco_unitario: Decimal
+    }
+
+    class Aprovacao {
+        +id: Integer
+        +pedido_id: Integer
+        +aprovador_id: Integer
+        +status: String
+        +comentario: String
+        +data: DateTime
+    }
+
+    class CentroCusto {
+        +id: Integer
+        +codigo: String
+        +descricao: String
+        +org_id: Integer
+    }
+
+    class LancamentoFinanceiro {
+        +id: Integer
+        +pedido_id: Integer
+        +valor: Decimal
+        +tipo: String
+        +status: String
+    }
+
+    class PropostaFornecedor {
+        +id: Integer
+        +pedido_id: Integer
+        +fornecedor_id: Integer
+        +preco_total: Decimal
+        +prazo_entrega: DateTime
+    }
+
+    class Notificacao {
+        +id: Integer
+        +tipo: String
+        +destinatario_id: Integer
+        +lida: Boolean
+        +payload: JSON
+    }
+
+    class LogAuditoria {
+        +id: Integer
+        +entidade: String
+        +acao: String
+        +usuario_id: Integer
+        +timestamp: DateTime
+        +delta: JSON
+    }
+
+    class CertificadoCompliance {
+        +id: Integer
+        +fornecedor_id: Integer
+        +tipo: String
+        +validade: Date
+    }
+
+    class RegraAprovacao {
+        +id: Integer
+        +org_id: Integer
+        +limite_valor: Decimal
+        +aprovador_necessario: String
+        +centro_custo_id: Integer
+    }
+
+    class TerritorialIBGE {
+        +codigo_ibge: String
+        +uf: String
+        +municipio: String
+        +regiao: String
+    }
+}
+
+Usuario "*" -- "*" Role : possui
+Usuario "1" -- "*" Notificacao : recebe
+Usuario "1" -- "*" LogAuditoria : gera
+Usuario "*" -- "0..1" Organizacao : pertence
+Usuario "*" -- "0..1" Fornecedor : pertence
+
+Fornecedor "1" -- "*" Endereco : possui
+Fornecedor "1" -- "*" DocumentoFornecedor : possui
+Fornecedor "1" -- "*" CertificadoCompliance : possui
+Fornecedor "1" -- "*" ProdutoServico : oferece
+Fornecedor "1" -- "*" PropostaFornecedor : envia
+
+Organizacao "1" -- "*" Pedido : realiza
+Organizacao "1" -- "*" Catalogo : define
+Organizacao "1" -- "*" Endereco : possui
+Organizacao "1" -- "*" RegraAprovacao : define
+Organizacao "1" -- "*" CentroCusto : possui
+
+Catalogo "1" -- "*" ItemCatalogo : contem
+ItemCatalogo "*" -- "1" ProdutoServico : refere_se
+
+Pedido "1" -- "*" ItemPedido : contem
+Pedido "1" -- "*" Aprovacao : requer
+Pedido "1" -- "*" LancamentoFinanceiro : gera
+Pedido "1" -- "*" PropostaFornecedor : recebe
+Pedido "*" -- "1" CentroCusto : alocado_em
+Pedido "*" -- "1" Endereco : entrega_em
+
+ItemPedido "*" -- "1" ItemCatalogo : refere_se
+
+RegraAprovacao "*" -- "1" CentroCusto : aplica_se
+
+@enduml

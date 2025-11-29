@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using PlataformaB2B_A2_TP3.Data;
+using PlataformaB2B_A2_TP3.Domain.Entities;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,7 +13,7 @@ builder.Services.AddDbContext<PlataformaB2B_A2_TP3Context>(options =>
         ?? throw new InvalidOperationException("Connection string not found.")));
 
 // Identity (usando int como chave)
-builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
+builder.Services.AddIdentity<Usuario, Role>(options =>
 {
     options.Password.RequireDigit = true;
     options.Password.RequireUppercase = true;
@@ -24,7 +25,7 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 
 // JWT config (coloque chaves em appsettings.json)
 var jwtSection = builder.Configuration.GetSection("Jwt");
-var jwtKey = jwtSection.GetValue<string>("Key") ?? "change_this_secret";
+var jwtKey = jwtSection.GetValue<string>("Key") ?? "change_this_secret_to_something_very_secure_and_long";
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -46,12 +47,13 @@ builder.Services.AddAuthentication(options =>
 });
 
 // Authorization policies (opcional)
+// Assuming Roles constants exist or we define them. Let's use strings for now to be safe if Roles class is missing.
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy(Roles.Administrador, policy => policy.RequireRole(Roles.Administrador));
-    options.AddPolicy(Roles.Comprador, policy => policy.RequireRole(Roles.Comprador));
-    options.AddPolicy(Roles.Aprovador, policy => policy.RequireRole(Roles.Aprovador));
-    options.AddPolicy(Roles.Fornecedor, policy => policy.RequireRole(Roles.Fornecedor));
+    options.AddPolicy("Administrador", policy => policy.RequireRole("Administrador"));
+    options.AddPolicy("Comprador", policy => policy.RequireRole("Comprador"));
+    options.AddPolicy("Aprovador", policy => policy.RequireRole("Aprovador"));
+    options.AddPolicy("Fornecedor", policy => policy.RequireRole("Fornecedor"));
 });
 
 builder.Services.AddControllersWithViews();
@@ -70,15 +72,15 @@ using (var scope = app.Services.CreateScope())
         var ctx = services.GetRequiredService<PlataformaB2B_A2_TP3Context>();
         ctx.Database.Migrate();
 
-        var roleManager = services.GetRequiredService<RoleManager<ApplicationRole>>();
-        var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+        var roleManager = services.GetRequiredService<RoleManager<Role>>();
+        var userManager = services.GetRequiredService<UserManager<Usuario>>();
 
-        var roles = new[] { Roles.Administrador, Roles.Comprador, Roles.Aprovador, Roles.Fornecedor };
+        var roles = new[] { "Administrador", "Comprador", "Aprovador", "Fornecedor" };
         foreach (var r in roles)
         {
             if (!roleManager.RoleExistsAsync(r).GetAwaiter().GetResult())
             {
-                roleManager.CreateAsync(new ApplicationRole { Name = r }).GetAwaiter().GetResult();
+                roleManager.CreateAsync(new Role(r)).GetAwaiter().GetResult();
             }
         }
 
@@ -88,9 +90,9 @@ using (var scope = app.Services.CreateScope())
         var admin = userManager.FindByEmailAsync(adminEmail).GetAwaiter().GetResult();
         if (admin == null)
         {
-            admin = new ApplicationUser { UserName = adminEmail, Email = adminEmail, Nome = "Administrator" };
+            admin = new Usuario { UserName = adminEmail, Email = adminEmail, Nome = "Administrator" };
             var r = userManager.CreateAsync(admin, adminPwd).GetAwaiter().GetResult();
-            if (r.Succeeded) userManager.AddToRoleAsync(admin, Roles.Administrador).GetAwaiter().GetResult();
+            if (r.Succeeded) userManager.AddToRoleAsync(admin, "Administrador").GetAwaiter().GetResult();
         }
     }
     catch (Exception ex)
