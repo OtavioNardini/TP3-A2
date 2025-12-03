@@ -12,9 +12,6 @@
         public required string UsuarioId { get; set; }
         public Usuario Usuario { get; set; }
 
-        // 1-1 relacionamento com Atendimento: Pedido -> Atendimento
-        public Atendimento Atendimento { get; set; }
-
         // Itens (N-N via PedidoItem)
         public ICollection<PedidoItem> PedidoItens { get; set; } = new List<PedidoItem>();
 

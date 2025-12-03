@@ -12,47 +12,47 @@ namespace RestauranteAPP_TP3.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PedidosController : ControllerBase
+    public class ProdutosController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
 
-        public PedidosController(ApplicationDbContext context)
+        public ProdutosController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/Pedidos
+        // GET: api/Produtos
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Pedido>>> GetPedidos()
+        public async Task<ActionResult<IEnumerable<Produtos>>> GetItensCardapio()
         {
-            return await _context.Pedidos.ToListAsync();
+            return await _context.ItensCardapio.ToListAsync();
         }
 
-        // GET: api/Pedidos/5
+        // GET: api/Produtos/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Pedido>> GetPedido(int id)
+        public async Task<ActionResult<Produtos>> GetProdutos(int id)
         {
-            var pedido = await _context.Pedidos.FindAsync(id);
+            var produtos = await _context.ItensCardapio.FindAsync(id);
 
-            if (pedido == null)
+            if (produtos == null)
             {
                 return NotFound();
             }
 
-            return pedido;
+            return produtos;
         }
 
-        // PUT: api/Pedidos/5
+        // PUT: api/Produtos/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPedido(int id, Pedido pedido)
+        public async Task<IActionResult> PutProdutos(int id, Produtos produtos)
         {
-            if (id != pedido.Id)
+            if (id != produtos.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(pedido).State = EntityState.Modified;
+            _context.Entry(produtos).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +60,7 @@ namespace RestauranteAPP_TP3.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!PedidoExists(id))
+                if (!ProdutosExists(id))
                 {
                     return NotFound();
                 }
@@ -73,36 +73,36 @@ namespace RestauranteAPP_TP3.Controllers
             return NoContent();
         }
 
-        // POST: api/Pedidos
+        // POST: api/Produtos
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Pedido>> PostPedido(Pedido pedido)
+        public async Task<ActionResult<Produtos>> PostProdutos(Produtos produtos)
         {
-            _context.Pedidos.Add(pedido);
+            _context.ItensCardapio.Add(produtos);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetPedido", new { id = pedido.Id }, pedido);
+            return CreatedAtAction("GetProdutos", new { id = produtos.Id }, produtos);
         }
 
-        // DELETE: api/Pedidos/5
+        // DELETE: api/Produtos/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePedido(int id)
+        public async Task<IActionResult> DeleteProdutos(int id)
         {
-            var pedido = await _context.Pedidos.FindAsync(id);
-            if (pedido == null)
+            var produtos = await _context.ItensCardapio.FindAsync(id);
+            if (produtos == null)
             {
                 return NotFound();
             }
 
-            _context.Pedidos.Remove(pedido);
+            _context.ItensCardapio.Remove(produtos);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool PedidoExists(int id)
+        private bool ProdutosExists(int id)
         {
-            return _context.Pedidos.Any(e => e.Id == id);
+            return _context.ItensCardapio.Any(e => e.Id == id);
         }
     }
 }

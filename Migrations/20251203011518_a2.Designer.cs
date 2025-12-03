@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RestauranteAPP_TP3.Data;
 
@@ -11,9 +12,11 @@ using RestauranteAPP_TP3.Data;
 namespace RestauranteAPP_TP3.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251203011518_a2")]
+    partial class a2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -155,6 +158,37 @@ namespace RestauranteAPP_TP3.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("RestauranteAPP_TP3.Models.Atendimento", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(34)
+                        .HasColumnType("nvarchar(34)");
+
+                    b.Property<int>("PedidoId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PedidoId");
+
+                    b.ToTable("Atendimentos");
+
+                    b.HasDiscriminator().HasValue("Atendimento");
+
+                    b.UseTphMappingStrategy();
+                });
+
             modelBuilder.Entity("RestauranteAPP_TP3.Models.Endereco", b =>
                 {
                     b.Property<int>("Id")
@@ -184,6 +218,30 @@ namespace RestauranteAPP_TP3.Migrations
                     b.HasIndex("UsuarioId");
 
                     b.ToTable("Enderecos");
+                });
+
+            modelBuilder.Entity("RestauranteAPP_TP3.Models.ItemCardapio", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Descricao")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("PrecoBase")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ItensCardapio");
                 });
 
             modelBuilder.Entity("RestauranteAPP_TP3.Models.Pedido", b =>
@@ -238,30 +296,6 @@ namespace RestauranteAPP_TP3.Migrations
                     b.HasIndex("PedidoId");
 
                     b.ToTable("PedidoItens");
-                });
-
-            modelBuilder.Entity("RestauranteAPP_TP3.Models.Produtos", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Descricao")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Nome")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("PrecoBase")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ItensCardapio");
                 });
 
             modelBuilder.Entity("RestauranteAPP_TP3.Models.Usuario", b =>
@@ -333,6 +367,37 @@ namespace RestauranteAPP_TP3.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("RestauranteAPP_TP3.Models.AtendimentoDeliveryAplicativo", b =>
+                {
+                    b.HasBaseType("RestauranteAPP_TP3.Models.Atendimento");
+
+                    b.Property<string>("NomeParceiro")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("TaxaParceiro")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasDiscriminator().HasValue("AtendimentoDeliveryAplicativo");
+                });
+
+            modelBuilder.Entity("RestauranteAPP_TP3.Models.AtendimentoDeliveryProprio", b =>
+                {
+                    b.HasBaseType("RestauranteAPP_TP3.Models.Atendimento");
+
+                    b.Property<decimal>("TaxaFixa")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasDiscriminator().HasValue("AtendimentoDeliveryProprio");
+                });
+
+            modelBuilder.Entity("RestauranteAPP_TP3.Models.AtendimentoPresencial", b =>
+                {
+                    b.HasBaseType("RestauranteAPP_TP3.Models.Atendimento");
+
+                    b.HasDiscriminator().HasValue("AtendimentoPresencial");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -384,6 +449,17 @@ namespace RestauranteAPP_TP3.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("RestauranteAPP_TP3.Models.Atendimento", b =>
+                {
+                    b.HasOne("RestauranteAPP_TP3.Models.Pedido", "Pedido")
+                        .WithMany()
+                        .HasForeignKey("PedidoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Pedido");
+                });
+
             modelBuilder.Entity("RestauranteAPP_TP3.Models.Endereco", b =>
                 {
                     b.HasOne("RestauranteAPP_TP3.Models.Usuario", "Usuario")
@@ -408,7 +484,7 @@ namespace RestauranteAPP_TP3.Migrations
 
             modelBuilder.Entity("RestauranteAPP_TP3.Models.PedidoItem", b =>
                 {
-                    b.HasOne("RestauranteAPP_TP3.Models.Produtos", "ItemCardapio")
+                    b.HasOne("RestauranteAPP_TP3.Models.ItemCardapio", "ItemCardapio")
                         .WithMany("PedidoItens")
                         .HasForeignKey("ItemCardapioId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -425,12 +501,12 @@ namespace RestauranteAPP_TP3.Migrations
                     b.Navigation("Pedido");
                 });
 
-            modelBuilder.Entity("RestauranteAPP_TP3.Models.Pedido", b =>
+            modelBuilder.Entity("RestauranteAPP_TP3.Models.ItemCardapio", b =>
                 {
                     b.Navigation("PedidoItens");
                 });
 
-            modelBuilder.Entity("RestauranteAPP_TP3.Models.Produtos", b =>
+            modelBuilder.Entity("RestauranteAPP_TP3.Models.Pedido", b =>
                 {
                     b.Navigation("PedidoItens");
                 });

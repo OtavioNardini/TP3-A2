@@ -1,4 +1,4 @@
-﻿@model RestauranteAPP_TP3.Models.ItemCardapio
+﻿@model RestauranteAPP_TP3.Models.Produtos
 
 @{
     ViewData["Title"] = "Create";
@@ -26,15 +26,6 @@
                 <label asp-for="PrecoBase" class="control-label"></label>
                 <input asp-for="PrecoBase" class="form-control" />
                 <span asp-validation-for="PrecoBase" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Periodo" class="control-label"></label>
-                <select asp-for="Periodo" class="form-control " asp-items="ViewBag.Periodo"></select>
-                <span asp-validation-for="Periodo" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <input asp-for="SugestaoDoChefe" class="form-check-input" type="checkbox" />
-                <label asp-for="SugestaoDoChefe" class="form-check-label"></label>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />

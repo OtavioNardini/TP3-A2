@@ -11,7 +11,6 @@ namespace RestauranteAPP_TP3.Services
     public class PedidoService
     {
         private readonly ApplicationDbContext _db;
-        private readonly decimal descontoSugestaoPercent = 0.20m;
 
         public PedidoService(ApplicationDbContext db) => _db = db;
 
@@ -27,35 +26,16 @@ namespace RestauranteAPP_TP3.Services
             var hoje = DateTime.Today;
 
             var sugestoes = await _db.ItensCardapio
-    .Where(s => s.SugestaoDoChefe == true && s.Periodo == PeriodoCardapio.Almoco)
-    .ToListAsync();
+                .ToListAsync();
 
             foreach (var item in pedido.PedidoItens)
             {
                 decimal unit = item.PrecoUnitario;
-                // verificar se item é sugestão do chefe no dia e no mesmo periodo
                 var ic = item.ItemCardapio;
-                var sugestao = sugestoes.FirstOrDefault(s => s.Id == ic.Id && s.Periodo == ic.Periodo);
-                if (sugestao != null)
-                {
-                    unit = unit * (1 - descontoSugestaoPercent);
-                }
                 subtotal += unit * item.Quantidade;
             }
 
-            // carregar atendimento
-            await _db.Entry(pedido).Reference(p => p.Atendimento).LoadAsync();
-            decimal taxa = 0m;
-            if (pedido.Atendimento is AtendimentoDeliveryProprio proprio)
-            {
-                taxa = proprio.TaxaFixa;
-            }
-            else if (pedido.Atendimento is AtendimentoDeliveryAplicativo app)
-            {
-                taxa = app.TaxaParceiro;
-            }
-            // presencial taxa normalmente 0
-            var total = subtotal + taxa;
+            decimal total = subtotal; 
             pedido.ValorTotal = total;
             return total;
         }

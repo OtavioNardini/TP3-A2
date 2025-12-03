@@ -12,7 +12,6 @@
         // Navegações
         public ICollection<Endereco> Enderecos { get; set; } = new List<Endereco>(); // 1-N
         public ICollection<Pedido> Pedidos { get; set; } = new List<Pedido>();
-        public ICollection<Reserva> Reservas { get; set; } = new List<Reserva>();
     }
 
 }

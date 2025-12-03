@@ -4,31 +4,22 @@ using RestauranteAPP_TP3.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
-
-
- 
-
 namespace RestauranteAPP_TP3.Controllers
+{
+    public class HomeController : Controller
     {
-        public class HomeController : Controller
+        private readonly ApplicationDbContext _context;
+
+        public HomeController(ApplicationDbContext context)
         {
-            private readonly ApplicationDbContext _context;
+            _context = context;
+        }
 
-            public HomeController(ApplicationDbContext context)
-            {
-                _context = context;
-            }
-
-            public async Task<IActionResult> Index()
-            {
-                // Busca apenas os itens marcados como sugestão do chefe
-                var sugestoes = await _context.ItensCardapio
-                    .Where(i => i.SugestaoDoChefe == true)
-                    .ToListAsync();
-
-                return View(sugestoes); // envia lista para a tela
-            }
-
+        // GET: Home/Index
+        public ActionResult Index()
+        {
+            return View();
+        }
 
         // GET: HomeController/Details/5
         public ActionResult Details(int id)

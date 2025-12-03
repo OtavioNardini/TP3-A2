@@ -1,4 +1,4 @@
-﻿@model IEnumerable<RestauranteAPP_TP3.Models.ItemCardapio>
+﻿@model IEnumerable<RestauranteAPP_TP3.Models.Produtos>
 
 @{
     ViewData["Title"] = "Cardapio";
@@ -21,12 +21,6 @@
             <th>
                 @Html.DisplayNameFor(model => model.PrecoBase)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Periodo)
-            </th>
-            <th>
-                @Html.DisplayNameFor(Model => Model.SugestaoDoChefe)
-            </th>
             <th></th>
         </tr>
     </thead>
@@ -41,12 +35,6 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.PrecoBase)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Periodo)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.SugestaoDoChefe)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

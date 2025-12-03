@@ -8,7 +8,7 @@
         public Pedido Pedido { get; set; }
 
         public int ItemCardapioId { get; set; }
-        public ItemCardapio ItemCardapio { get; set; }
+        public Produtos ItemCardapio { get; set; }
 
         public int Quantidade { get; set; }
         public decimal PrecoUnitario { get; set; } // snapshot do preço no momento do pedido
