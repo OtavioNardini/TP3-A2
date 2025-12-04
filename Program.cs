@@ -21,12 +21,12 @@ builder.Services.AddIdentity<Usuario, IdentityRole>(options => options.SignIn.Re
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
-// Ensure login path goes to /Account/Login (we handle that route below)
+// Ensure login path goes to the Identity UI pages (area "Identity")
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.LoginPath = "/Account/Login";
-    options.LogoutPath = "/Account/Logout";
-    options.AccessDeniedPath = "/Account/AccessDenied";
+    options.LoginPath = "/Identity/Account/Login";
+    options.LogoutPath = "/Identity/Account/Logout";
+    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
 });
 
 builder.Services.AddScoped<IEmailSender, EmailSender>();

@@ -1,33 +1,392 @@
-﻿@using System.Collections.Generic
-@using System.Linq
-@using System.Threading.Tasks
-@using Microsoft.AspNetCore.Mvc
-@using Microsoft.EntityFrameworkCore
-@using RestauranteAPP_TP3.Data
-@using RestauranteAPP_TP3.Models
-
-@{
+﻿@{
     ViewData["Title"] = "Página Inicial";
 }
-<div class="text-center">
-    <h1 class="display-4">🍽 Bem-vindo ao RestauranteAPP</h1>
-    <p class="lead">Faça seu pedido e consulte o cardápio.</p>
-</div>
 
-<hr />
+<style>
+    :root {
+        --background-start: #ffffff;
+        --background-end: #1a1a2e;
+        --primary: #6366f1;
+        --primary-hover: #4f46e5;
+        --text-light: #f8fafc;
+        --text-dark: #0f172a;
+        --text-muted: #94a3b8;
+        --card-bg: rgba(255, 255, 255, 0.05);
+        --card-border: rgba(255, 255, 255, 0.1);
+    }
 
-<div class="container mt-5">
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <h2>📋 Cardápio</h2>
-            <a asp-action="Index" asp-controller="Produtos" class="btn btn-primary mb-3">
-                Ver Todos os Produtos
-            </a>
+    .hero-section {
+        min-height: 100vh;
+        background: linear-gradient(180deg, var(--background-start) 0%, #e2e8f0 30%, #475569 70%, var(--background-end) 100%);
+        padding: 0;
+        margin: -1rem -15px;
+    }
+
+    .hero-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 4rem 2rem;
+    }
+
+    .hero-header {
+        text-align: center;
+        padding: 6rem 0 4rem;
+    }
+
+    .hero-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, var(--primary), #8b5cf6);
+        color: white;
+        padding: 0.5rem 1.5rem;
+        border-radius: 50px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-bottom: 1.5rem;
+        letter-spacing: 0.05em;
+    }
+
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--text-dark) 0%, #475569 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1.5rem;
+        line-height: 1.1;
+    }
+
+    .hero-subtitle {
+        font-size: 1.25rem;
+        color: #64748b;
+        max-width: 600px;
+        margin: 0 auto 2.5rem;
+        line-height: 1.6;
+    }
+
+    .hero-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn-primary-custom {
+        background: linear-gradient(135deg, var(--primary), #8b5cf6);
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: none;
+        box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+    }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4);
+            color: white;
+        }
+
+    .btn-secondary-custom {
+        background: rgba(255, 255, 255, 0.9);
+        color: var(--text-dark);
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: 1px solid #e2e8f0;
+    }
+
+        .btn-secondary-custom:hover {
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            color: var(--text-dark);
+        }
+
+    .features-section {
+        padding: 4rem 0;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 4rem;
+    }
+
+    .feature-card {
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 2rem;
+        transition: all 0.3s ease;
+    }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+    .feature-icon {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, var(--primary), #8b5cf6);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+    }
+
+    .feature-title {
+        color: var(--text-light);
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .feature-desc {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    .products-section {
+        padding: 4rem 0;
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .section-title {
+        color: var(--text-light);
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .section-subtitle {
+        color: var(--text-muted);
+        font-size: 1rem;
+    }
+
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .product-card {
+        background: rgba(255, 255, 255, 0.06);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+    .product-image {
+        height: 180px;
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+    }
+
+    .product-body {
+        padding: 1.5rem;
+    }
+
+    .product-name {
+        color: var(--text-light);
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .product-desc {
+        color: var(--text-muted);
+        font-size: 0.875rem;
+        margin-bottom: 1rem;
+        line-height: 1.5;
+    }
+
+    .product-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .product-price {
+        color: #10b981;
+        font-size: 1.25rem;
+        font-weight: 700;
+    }
+
+    .btn-details {
+        background: rgba(99, 102, 241, 0.2);
+        color: #a5b4fc;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+
+        .btn-details:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+    .stats-section {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        padding: 3rem 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        margin: 2rem 0;
+    }
+
+    .stat-item {
+        text-align: center;
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--primary), #8b5cf6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .stat-label {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        margin-top: 0.25rem;
+    }
+
+    .loading-spinner {
+        display: flex;
+        justify-content: center;
+        padding: 4rem;
+    }
+
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid rgba(255, 255, 255, 0.1);
+        border-top-color: var(--primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem;
+        color: var(--text-muted);
+    }
+</style>
+
+<div class="hero-section">
+    <div class="hero-content">
+        <!-- Hero Header -->
+        <div class="hero-header">
+            <span class="hero-badge">🚀 Plataforma B2B</span>
+            <h1 class="hero-title">Conecte-se aos melhores<br />fornecedores do mercado</h1>
+            <p class="hero-subtitle">
+                Simplifique suas compras empresariais. Cadastre produtos, gerencie pedidos
+                e expanda seus negócios em uma única plataforma.
+            </p>
+            <div class="hero-buttons">
+                <a asp-action="Index" asp-controller="Produtos" class="btn-primary-custom">
+                    Explorar Catálogo
+                </a>
+                <a asp-area="Identity" asp-page="/Account/Register" class="btn-secondary-custom">
+                    Seja um Fornecedor
+                </a>
+            </div>
         </div>
-    </div>
 
-    <div class="row" id="produtosContainer">
-        <p>Carregando produtos...</p>
+        <!-- Features -->
+        <div class="features-section">
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📦</div>
+                    <h3 class="feature-title">Catálogo Completo</h3>
+                    <p class="feature-desc">Acesse milhares de produtos de fornecedores verificados em um só lugar.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3 class="feature-title">Pedidos Rápidos</h3>
+                    <p class="feature-desc">Faça pedidos em poucos cliques e acompanhe o status em tempo real.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3 class="feature-title">Seguro & Confiável</h3>
+                    <p class="feature-desc">Transações protegidas e fornecedores certificados para sua tranquilidade.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-section">
+            <div class="stat-item">
+                <div class="stat-number">500+</div>
+                <div class="stat-label">Fornecedores Ativos</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">10k+</div>
+                <div class="stat-label">Produtos Cadastrados</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">50k+</div>
+                <div class="stat-label">Pedidos Realizados</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">98%</div>
+                <div class="stat-label">Satisfação</div>
+            </div>
+        </div>
+
+        <!-- Products Section -->
+        <div class="products-section">
+            <div class="section-header">
+                <h2 class="section-title">Produtos em Destaque</h2>
+                <p class="section-subtitle">Confira as melhores ofertas dos nossos fornecedores</p>
+            </div>
+
+            <div class="products-grid" id="produtosContainer">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -37,26 +396,25 @@
             try {
                 const response = await fetch('/api/produtos');
                 const produtos = await response.json();
-                
+
                 const container = document.getElementById('produtosContainer');
                 container.innerHTML = '';
-                
+
                 if (produtos.length === 0) {
-                    container.innerHTML = '<p class="col-12">Nenhum produto disponível.</p>';
+                    container.innerHTML = '<div class="empty-state"><p>Nenhum produto disponível no momento.</p></div>';
                     return;
                 }
-                
+
                 produtos.forEach(produto => {
                     const card = `
-                        <div class="col-md-4 mb-4">
-                            <div class="card h-100">
-                                <div class="card-body">
-                                    <h5 class="card-title">${produto.nome}</h5>
-                                    <p class="card-text">${produto.descricao}</p>
-                                    <p class="card-text"><strong>R$ ${parseFloat(produto.precoBase).toFixed(2)}</strong></p>
-                                </div>
-                                <div class="card-footer">
-                                    <a href="/Produtos/Details/${produto.id}" class="btn btn-sm btn-info">Detalhes</a>
+                        <div class="product-card">
+                            <div class="product-image">📦</div>
+                            <div class="product-body">
+                                <h5 class="product-name">${produto.nome}</h5>
+                                <p class="product-desc">${produto.descricao || 'Sem descrição disponível'}</p>
+                                <div class="product-footer">
+                                    <span class="product-price">R$ ${parseFloat(produto.precoBase).toFixed(2)}</span>
+                                    <a href="/Produtos/Details/${produto.id}" class="btn-details">Ver Detalhes</a>
                                 </div>
                             </div>
                         </div>
@@ -65,8 +423,8 @@
                 });
             } catch (error) {
                 console.error('Erro ao carregar produtos:', error);
-                document.getElementById('produtosContainer').innerHTML = 
-                    '<p class="col-12 text-danger">Erro ao carregar produtos.</p>';
+                document.getElementById('produtosContainer').innerHTML =
+                    '<div class="empty-state"><p>Erro ao carregar produtos. Tente novamente mais tarde.</p></div>';
             }
         });
     </script>

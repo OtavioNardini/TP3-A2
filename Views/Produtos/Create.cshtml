@@ -1,43 +1,248 @@
 ﻿@model RestauranteAPP_TP3.Models.Produtos
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Novo Produto";
 }
 
-<h1>Create</h1>
+<style>
+    :root {
+        --background-start: #ffffff;
+        --background-end: #1a1a2e;
+        --primary: #6366f1;
+        --primary-hover: #4f46e5;
+        --text-light: #f8fafc;
+        --text-dark: #0f172a;
+        --text-muted: #94a3b8;
+        --card-bg: rgba(255, 255, 255, 0.06);
+        --card-border: rgba(255, 255, 255, 0.1);
+        --success: #10b981;
+        --danger: #ef4444;
+    }
 
-<h4>ItemCardapio</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Nome" class="control-label"></label>
-                <input asp-for="Nome" class="form-control" />
-                <span asp-validation-for="Nome" class="text-danger"></span>
+    .page-wrapper {
+        min-height: 100vh;
+        background: linear-gradient(180deg, var(--background-start) 0%, #e2e8f0 20%, #475569 60%, var(--background-end) 100%);
+        padding: 2rem;
+        margin: -1rem -15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .form-container {
+        max-width: 500px;
+        width: 100%;
+    }
+
+    .form-card {
+        background: var(--card-bg);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--card-border);
+        border-radius: 20px;
+        padding: 2.5rem;
+    }
+
+    .form-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .form-icon {
+        width: 64px;
+        height: 64px;
+        background: linear-gradient(135deg, var(--primary), #8b5cf6);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        margin: 0 auto 1rem;
+    }
+
+    .form-title {
+        color: var(--text-light);
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-subtitle {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        color: var(--text-light);
+        font-weight: 500;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-input {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid var(--card-border);
+        border-radius: 12px;
+        padding: 0.875rem 1rem;
+        color: var(--text-light);
+        font-size: 1rem;
+        transition: all 0.2s ease;
+    }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .form-input.input-validation-error {
+            border-color: var(--danger);
+        }
+
+    .text-danger {
+        color: #fca5a5 !important;
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+        display: block;
+    }
+
+    .price-input-wrapper {
+        position: relative;
+    }
+
+    .price-prefix {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+
+    .price-input {
+        padding-left: 2.5rem;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .btn-submit {
+        flex: 1;
+        background: linear-gradient(135deg, var(--primary), #8b5cf6);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+    }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4);
+        }
+
+    .btn-back {
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--text-light);
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 500;
+        font-size: 1rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: 1px solid var(--card-border);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: var(--text-light);
+        }
+
+    .validation-summary {
+        background: rgba(239, 68, 68, 0.15);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        color: #fca5a5;
+    }
+
+    .helper-text {
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+    }
+</style>
+
+<div class="page-wrapper">
+    <div class="form-container">
+        <div class="form-card">
+            <div class="form-header">
+                <div class="form-icon">📦</div>
+                <h1 class="form-title">Novo Produto</h1>
+                <p class="form-subtitle">Preencha as informações do produto</p>
             </div>
-            <div class="form-group">
-                <label asp-for="Descricao" class="control-label"></label>
-                <input asp-for="Descricao" class="form-control" />
-                <span asp-validation-for="Descricao" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PrecoBase" class="control-label"></label>
-                <input asp-for="PrecoBase" class="form-control" />
-                <span asp-validation-for="PrecoBase" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+                <div class="form-group">
+                    <label asp-for="Nome" class="form-label">Nome do Produto</label>
+                    <input asp-for="Nome" class="form-input" placeholder="Ex: Produto Premium" />
+                    <span asp-validation-for="Nome" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Descricao" class="form-label">Descrição</label>
+                    <input asp-for="Descricao" class="form-input" placeholder="Descreva o produto..." />
+                    <span asp-validation-for="Descricao" class="text-danger"></span>
+                    <span class="helper-text">Breve descrição das características do produto</span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="PrecoBase" class="form-label">Preço Base</label>
+                    <div class="price-input-wrapper">
+                        <span class="price-prefix">R$</span>
+                        <input asp-for="PrecoBase" class="form-input price-input" placeholder="0,00" />
+                    </div>
+                    <span asp-validation-for="PrecoBase" class="text-danger"></span>
+                </div>
+
+                <div class="form-actions">
+                    <a asp-action="Index" class="btn-back">
+                        ← Voltar
+                    </a>
+                    <button type="submit" class="btn-submit">
+                        Cadastrar Produto
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

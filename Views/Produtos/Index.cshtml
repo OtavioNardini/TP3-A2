@@ -4,42 +4,392 @@
     ViewData["Title"] = "Produtos";
 }
 
-<h1>@ViewData["Title"]</h1>
+<style>
+    :root {
+        --background-start: #ffffff;
+        --background-end: #1a1a2e;
+        --primary: #6366f1;
+        --primary-hover: #4f46e5;
+        --text-light: #f8fafc;
+        --text-dark: #0f172a;
+        --text-muted: #94a3b8;
+        --card-bg: rgba(255, 255, 255, 0.06);
+        --card-border: rgba(255, 255, 255, 0.1);
+        --success: #10b981;
+        --danger: #ef4444;
+        --warning: #f59e0b;
+    }
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Nome)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Descricao)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PrecoBase)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Nome)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Descricao)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PrecoBase)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-        </tr>
+    .page-wrapper {
+        min-height: 100vh;
+        background: linear-gradient(180deg, var(--background-start) 0%, #e2e8f0 20%, #475569 60%, var(--background-end) 100%);
+        padding: 2rem;
+        margin: -1rem -15px;
+    }
+
+    .page-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding: 2rem 0;
+    }
+
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-light);
+        margin: 0;
+    }
+
+    .page-subtitle {
+        color: var(--text-muted);
+        margin-top: 0.5rem;
+    }
+
+    .btn-create {
+        background: linear-gradient(135deg, var(--primary), #8b5cf6);
+        color: white;
+        padding: 0.875rem 1.75rem;
+        border-radius: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+    }
+
+        .btn-create:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4);
+            color: white;
+        }
+
+    .table-container {
+        background: var(--card-bg);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--card-border);
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .products-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0;
+    }
+
+        .products-table thead {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .products-table th {
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 1rem 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .products-table td {
+            padding: 1.25rem 1.5rem;
+            color: var(--text-light);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            vertical-align: middle;
+        }
+
+        .products-table tbody tr {
+            transition: all 0.2s ease;
+        }
+
+            .products-table tbody tr:hover {
+                background: rgba(255, 255, 255, 0.05);
+            }
+
+            .products-table tbody tr:last-child td {
+                border-bottom: none;
+            }
+
+    .product-name {
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    .product-desc {
+        color: var(--text-muted);
+        font-size: 0.875rem;
+        max-width: 300px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .product-price {
+        color: var(--success);
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    .actions-cell {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .btn-action {
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .btn-edit {
+        background: rgba(99, 102, 241, 0.15);
+        color: #a5b4fc;
+        border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+
+        .btn-edit:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+    .btn-delete {
+        background: rgba(239, 68, 68, 0.15);
+        color: #fca5a5;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+        .btn-delete:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--text-muted);
+    }
+
+    .empty-state-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    .empty-state-text {
+        font-size: 1.1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .search-bar {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .search-input {
+        flex: 1;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid var(--card-border);
+        border-radius: 12px;
+        padding: 0.875rem 1.25rem;
+        color: var(--text-light);
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
+    }
+
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+    .stats-bar {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .stat-badge {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid var(--card-border);
+        border-radius: 10px;
+        padding: 0.75rem 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .stat-badge-icon {
+        font-size: 1.25rem;
+    }
+
+    .stat-badge-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .stat-badge-value {
+        color: var(--text-light);
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    .stat-badge-label {
+        color: var(--text-muted);
+        font-size: 0.75rem;
+    }
+
+    @@media (max-width: 768px) {
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .stats-bar {
+            flex-wrap: wrap;
+        }
+
+        .products-table th,
+        .products-table td {
+            padding: 1rem;
+        }
+
+        .product-desc {
+            max-width: 150px;
+        }
+
+        .actions-cell {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<div class="page-wrapper">
+    <div class="page-container">
+        <!-- Header -->
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">📦 Catálogo de Produtos</h1>
+                <p class="page-subtitle">Gerencie todos os produtos cadastrados na plataforma</p>
+            </div>
+            <a asp-action="Create" class="btn-create">
+                <span>+</span> Novo Produto
+            </a>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-bar">
+            <div class="stat-badge">
+                <span class="stat-badge-icon">📊</span>
+                <div class="stat-badge-info">
+                    <span class="stat-badge-value">@Model.Count()</span>
+                    <span class="stat-badge-label">Total de Produtos</span>
+                </div>
+            </div>
+            <div class="stat-badge">
+                <span class="stat-badge-icon">✅</span>
+                <div class="stat-badge-info">
+                    <span class="stat-badge-value">@Model.Count()</span>
+                    <span class="stat-badge-label">Ativos</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search -->
+        <div class="search-bar">
+            <input type="text" class="search-input" placeholder="🔍 Buscar produtos..." id="searchInput" />
+        </div>
+
+        <!-- Table -->
+        <div class="table-container">
+            @if (Model.Any())
+            {
+                <table class="products-table">
+                    <thead>
+                        <tr>
+                            <th>Nome do Produto</th>
+                            <th>Descrição</th>
+                            <th>Preço Base</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsBody">
+                        @foreach (var item in Model)
+                        {
+                            <tr class="product-row">
+                                <td>
+                                    <span class="product-name">@item.Nome</span>
+                                </td>
+                                <td>
+                                    <span class="product-desc">@(string.IsNullOrEmpty(item.Descricao) ? "Sem descrição" : item.Descricao)</span>
+                                </td>
+                                <td>
+                                    <span class="product-price">R$ @item.PrecoBase.ToString("F2")</span>
+                                </td>
+                                <td>
+                                    <div class="actions-cell">
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn-action btn-edit">
+                                            ✏️ Editar
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn-action btn-delete">
+                                            🗑️ Excluir
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <div class="empty-state-icon">📭</div>
+                    <p class="empty-state-text">Nenhum produto cadastrado ainda.</p>
+                    <a asp-action="Create" class="btn-create">+ Cadastrar Primeiro Produto</a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('.product-row');
+
+            rows.forEach(row => {
+                const name = row.querySelector('.product-name').textContent.toLowerCase();
+                const desc = row.querySelector('.product-desc').textContent.toLowerCase();
+
+                if (name.includes(searchTerm) || desc.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    </script>
 }
-    </tbody>
-</table>

@@ -1,5 +1,4 @@
 ﻿@using Microsoft.AspNetCore.Identity
-
 @inject SignInManager<Usuario> SignInManager
 @inject UserManager<Usuario> UserManager
 <!DOCTYPE html>
@@ -7,19 +6,339 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - RestauranteAPP</title>
+    <title>@ViewData["Title"] - B2B</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --secondary-color: #1e293b;
+            --text-dark: #0f172a;
+            --text-light: #64748b;
+            --bg-light: #f8fafc;
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+            color: var(--text-dark);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Navbar Moderna */
+        .navbar {
+            background: rgba(30, 41, 59, 0.95) !important;
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--white) !important;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+            .navbar-brand::after {
+                content: '';
+                position: absolute;
+                bottom: -5px;
+                left: 0;
+                width: 0;
+                height: 3px;
+                background: var(--primary-color);
+                transition: width 0.3s ease;
+            }
+
+            .navbar-brand:hover::after {
+                width: 100%;
+            }
+
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.8) !important;
+            margin: 0 0.5rem;
+            padding: 0.5rem 1rem !important;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            position: relative;
+        }
+
+            .navbar-nav .nav-link:hover {
+                color: var(--white) !important;
+                background: rgba(99, 102, 241, 0.2);
+                transform: translateY(-2px);
+            }
+
+            .navbar-nav .nav-link.active {
+                background: var(--primary-color);
+                color: var(--white) !important;
+            }
+
+        .navbar-toggler {
+            border: none;
+            padding: 0.5rem;
+        }
+
+            .navbar-toggler:focus {
+                box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+            }
+
+        /* Botões de Login/Logout */
+        #logout, #login, #register {
+            background: var(--primary-color);
+            color: var(--white) !important;
+            border: none;
+            padding: 0.5rem 1.5rem !important;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 0 0.25rem;
+        }
+
+            #logout:hover, #login:hover, #register:hover {
+                background: var(--primary-dark);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+            }
+
+        #logoutForm {
+            margin: 0;
+            display: inline;
+        }
+
+        #manage {
+            color: var(--primary-light) !important;
+            font-weight: 600;
+        }
+
+        /* Container Principal */
+        .container {
+            max-width: 1200px;
+        }
+
+        main {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin: 2rem auto;
+            box-shadow: 0 10px 40px rgba(99, 102, 241, 0.1);
+            min-height: 500px;
+            animation: fadeInUp 0.6s ease;
+        }
+
+         fadeInUp {
+            from
+
+        {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(30, 41, 59, 0.95);
+            color: rgba(255, 255, 255, 0.7);
+            padding: 2rem 0;
+            margin-top: 4rem;
+            border-top: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+            .footer .container {
+                font-size: 0.9rem;
+            }
+
+        /* Títulos e Textos */
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--text-dark);
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Cards e Elementos */
+        .card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.08);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+            .card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 30px rgba(99, 102, 241, 0.15);
+            }
+
+        /* Botões */
+        .btn-primary {
+            background: var(--primary-color);
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+            .btn-primary:hover {
+                background: var(--primary-dark);
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+            }
+
+        .btn-secondary {
+            background: var(--white);
+            color: var(--text-dark);
+            border: 2px solid var(--primary-color);
+            padding: 0.75rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+            .btn-secondary:hover {
+                background: var(--primary-color);
+                color: var(--white);
+                transform: translateY(-2px);
+            }
+
+        /* Tabelas */
+        .table {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+            .table thead {
+                background: var(--primary-color);
+                color: var(--white);
+            }
+
+            .table tbody tr {
+                transition: all 0.2s ease;
+            }
+
+                .table tbody tr:hover {
+                    background: rgba(99, 102, 241, 0.05);
+                    transform: scale(1.01);
+                }
+
+        /* Forms */
+        .form-control {
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+            .form-control:focus {
+                border-color: var(--primary-color);
+                box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+            }
+
+        /* Badge/Tag */
+        .badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+(max-width: 768px) {
+            main
+
+        {
+            padding: 1.5rem;
+            margin: 1rem auto;
+        }
+
+        h1 {
+            font-size: 2rem;
+        }
+
+        .navbar-nav .nav-link {
+            margin: 0.25rem 0;
+        }
+
+        #logout, #login, #register {
+            margin: 0.25rem 0;
+            display: block;
+            width: 100%;
+        }
+
+        }
+
+         pulse {
+            0%, 100%
+
+        {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.5;
+        }
+
+        }
+
+        .loading {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-light);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 5px;
+        }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: var(--primary-dark);
+            }
+    </style>
 </head>
 <body>
     <header>
         <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
             <div class="container">
-                <a class="navbar-brand" asp-controller="Home" asp-action="Index">🍽 RestauranteAPP</a>
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">🚀 B2B Media</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+
                 <div class="collapse navbar-collapse" id="navbarNav">
+                    <!-- left links -->
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Home" asp-action="Index">Início</a>
@@ -30,45 +349,26 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Pedidos" asp-action="Index">Pedidos</a>
                         </li>
-                        @if (SignInManager.IsSignedIn(User))
-                        {
-                            <li class="nav-item">
-                                <a id="manage" class="nav-link text-light" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @UserManager.GetUserName(User)!</a>
-                            </li>
-                            <li class="nav-item">
-                                <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                                    <button id="logout" type="submit" class="nav-link btn btn-link text-light border-0">Logout</button>
-                                </form>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-light" id="register" asp-area="Identity" asp-page="/Account/Register">Register</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-light" id="login" asp-area="Identity" asp-page="/Account/Login">Login</a>
-                            </li>
-                        }
                     </ul>
-                    <partial name="_LoginPartial" />
+
+                    <!-- auth area: render partial's li items inside a single right-aligned ul -->
+                    <ul class="navbar-nav ms-auto">
+                        <partial name="_LoginPartial" />
+                    </ul>
                 </div>
             </div>
         </nav>
     </header>
-
     <div class="container mt-4">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
-
     <footer class="border-top footer text-muted text-center mt-4">
         <div class="container">
-            &copy; @DateTime.Now.Year - RestauranteAPP
+            &copy; @DateTime.Now.Year - B2B Platform | Todos os direitos reservados
         </div>
     </footer>
-
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     @RenderSection("Scripts", required: false)
