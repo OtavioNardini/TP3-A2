@@ -14,6 +14,7 @@
             <th>Cliente</th>
             <th>Itens</th>
             <th>Valor Total</th>
+            <th>Ações</th>
         </tr>
     </thead>
     <tbody>
@@ -26,11 +27,18 @@
                     <ul>
                         @foreach (var pi in pedido.PedidoItens)
                         {
-                            <li>@pi.ItemCardapio.Nome (Qtd: @pi.Quantidade)</li>
+                            <li>@pi.Produtos?.Nome (Qtd: @pi.Quantidade)</li>
                         }
                     </ul>
                 </td>
                 <td>@pedido.ValorTotal.ToString("C")</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@pedido.Id" class="btn btn-sm btn-primary">Editar</a>
+                    <form asp-action="Delete" asp-route-id="@pedido.Id" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Confirma exclusão deste pedido?');">Excluir</button>
+                    </form>
+                </td>
             </tr>
         }
     </tbody>

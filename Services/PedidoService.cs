@@ -19,19 +19,15 @@ namespace RestauranteAPP_TP3.Services
             // carregar itens e atendimento
             await _db.Entry(pedido).Collection(p => p.PedidoItens).LoadAsync();
             foreach (var pi in pedido.PedidoItens)
-                await _db.Entry(pi).Reference(p => p.ItemCardapio).LoadAsync();
+                await _db.Entry(pi).Reference(p => p.Produtos).LoadAsync();
 
             decimal subtotal = 0m;
-
-            var hoje = DateTime.Today;
-
-            var sugestoes = await _db.ItensCardapio
-                .ToListAsync();
+          
 
             foreach (var item in pedido.PedidoItens)
             {
                 decimal unit = item.PrecoUnitario;
-                var ic = item.ItemCardapio;
+                var ic = item.Produtos;
                 subtotal += unit * item.Quantidade;
             }
 

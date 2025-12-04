@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RestauranteAPP-TP3")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+db2743f4938a8ecceb92ca042d4600d25e3329d5")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f23eb97de7509d90ba299c992848d9e028976f73")]
 [assembly: System.Reflection.AssemblyProductAttribute("RestauranteAPP-TP3")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RestauranteAPP-TP3")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RestauranteAPP_TP3.Data;
@@ -10,9 +9,8 @@ using RestauranteAPP_TP3.Models;
 
 namespace RestauranteAPP_TP3.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class ProdutosController : ControllerBase
+    [AllowAnonymous]
+    public class ProdutosController : Controller
     {
         private readonly ApplicationDbContext _context;
 
@@ -21,88 +19,141 @@ namespace RestauranteAPP_TP3.Controllers
             _context = context;
         }
 
-        // GET: api/Produtos
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Produtos>>> GetItensCardapio()
+        // MVC: GET /Produtos
+        public async Task<IActionResult> Index()
+        {
+            var itens = await _context.ItensCardapio.ToListAsync();
+            return View(itens);
+        }
+
+        // MVC: GET /Produtos/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null) return NotFound();
+            var produto = await _context.ItensCardapio.FirstOrDefaultAsync(p => p.Id == id);
+            if (produto == null) return NotFound();
+            return View(produto);
+        }
+
+        // MVC: GET /Produtos/Create
+        public IActionResult Create() => View();
+
+        // MVC: POST /Produtos/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("Nome,Descricao,PrecoBase")] Produtos produtos)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.ItensCardapio.Add(produtos);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            return View(produtos);
+        }
+
+        // MVC: GET /Produtos/Edit/5
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null) return NotFound();
+            var produto = await _context.ItensCardapio.FindAsync(id);
+            if (produto == null) return NotFound();
+            return View(produto);
+        }
+
+        // MVC: POST /Produtos/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Descricao,PrecoBase")] Produtos produtos)
+        {
+            if (id != produtos.Id) return NotFound();
+            if (!ModelState.IsValid) return View(produtos);
+
+            try
+            {
+                _context.Update(produtos);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!_context.ItensCardapio.Any(e => e.Id == produtos.Id)) return NotFound();
+                throw;
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        // MVC: GET /Produtos/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null) return NotFound();
+            var produto = await _context.ItensCardapio.FirstOrDefaultAsync(p => p.Id == id);
+            if (produto == null) return NotFound();
+            return View(produto);
+        }
+
+        // MVC: POST /Produtos/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var produto = await _context.ItensCardapio.FindAsync(id);
+            if (produto != null)
+            {
+                _context.ItensCardapio.Remove(produto);
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+        // --- Explicit API endpoints (keep these for Home fetch / JS) ---
+        [HttpGet("/api/produtos")]
+        public async Task<ActionResult<IEnumerable<Produtos>>> GetApiProdutos()
         {
             return await _context.ItensCardapio.ToListAsync();
         }
 
-        // GET: api/Produtos/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Produtos>> GetProdutos(int id)
+        [HttpGet("/api/produtos/{id}")]
+        public async Task<ActionResult<Produtos>> GetApiProduto(int id)
         {
-            var produtos = await _context.ItensCardapio.FindAsync(id);
-
-            if (produtos == null)
-            {
-                return NotFound();
-            }
-
-            return produtos;
+            var p = await _context.ItensCardapio.FindAsync(id);
+            if (p == null) return NotFound();
+            return p;
         }
 
-        // PUT: api/Produtos/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutProdutos(int id, Produtos produtos)
+        [HttpPost("/api/produtos")]
+        public async Task<ActionResult<Produtos>> PostApiProduto(Produtos produtos)
         {
-            if (id != produtos.Id)
-            {
-                return BadRequest();
-            }
+            _context.ItensCardapio.Add(produtos);
+            await _context.SaveChangesAsync();
+            return CreatedAtAction(nameof(GetApiProduto), new { id = produtos.Id }, produtos);
+        }
 
+        [HttpPut("/api/produtos/{id}")]
+        public async Task<IActionResult> PutApiProduto(int id, Produtos produtos)
+        {
+            if (id != produtos.Id) return BadRequest();
             _context.Entry(produtos).State = EntityState.Modified;
-
             try
             {
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ProdutosExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                if (!_context.ItensCardapio.Any(e => e.Id == id)) return NotFound();
+                throw;
             }
-
             return NoContent();
         }
 
-        // POST: api/Produtos
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Produtos>> PostProdutos(Produtos produtos)
+        [HttpDelete("/api/produtos/{id}")]
+        public async Task<IActionResult> DeleteApiProduto(int id)
         {
-            _context.ItensCardapio.Add(produtos);
+            var prod = await _context.ItensCardapio.FindAsync(id);
+            if (prod == null) return NotFound();
+            _context.ItensCardapio.Remove(prod);
             await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetProdutos", new { id = produtos.Id }, produtos);
-        }
-
-        // DELETE: api/Produtos/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProdutos(int id)
-        {
-            var produtos = await _context.ItensCardapio.FindAsync(id);
-            if (produtos == null)
-            {
-                return NotFound();
-            }
-
-            _context.ItensCardapio.Remove(produtos);
-            await _context.SaveChangesAsync();
-
             return NoContent();
-        }
-
-        private bool ProdutosExists(int id)
-        {
-            return _context.ItensCardapio.Any(e => e.Id == id);
         }
     }
 }

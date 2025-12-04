@@ -34,7 +34,7 @@
                 .HasForeignKey(pi => pi.PedidoId);
 
             builder.Entity<PedidoItem>()
-                .HasOne(pi => pi.ItemCardapio)
+                .HasOne(pi => pi.Produtos)
                 .WithMany(i => i.PedidoItens)
                 .HasForeignKey(pi => pi.ItemCardapioId);
 

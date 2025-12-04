@@ -1,10 +1,73 @@
-﻿
+﻿@using System.Collections.Generic
+@using System.Linq
+@using System.Threading.Tasks
+@using Microsoft.AspNetCore.Mvc
+@using Microsoft.EntityFrameworkCore
+@using RestauranteAPP_TP3.Data
+@using RestauranteAPP_TP3.Models
+
 @{
     ViewData["Title"] = "Página Inicial";
 }
 <div class="text-center">
     <h1 class="display-4">🍽 Bem-vindo ao RestauranteAPP</h1>
-    <p class="lead">Faça seu pedido, consulte o cardápio e reserve mesas para o jantar.</p>
+    <p class="lead">Faça seu pedido e consulte o cardápio.</p>
 </div>
 
 <hr />
+
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2>📋 Cardápio</h2>
+            <a asp-action="Index" asp-controller="Produtos" class="btn btn-primary mb-3">
+                Ver Todos os Produtos
+            </a>
+        </div>
+    </div>
+
+    <div class="row" id="produtosContainer">
+        <p>Carregando produtos...</p>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                const response = await fetch('/api/produtos');
+                const produtos = await response.json();
+                
+                const container = document.getElementById('produtosContainer');
+                container.innerHTML = '';
+                
+                if (produtos.length === 0) {
+                    container.innerHTML = '<p class="col-12">Nenhum produto disponível.</p>';
+                    return;
+                }
+                
+                produtos.forEach(produto => {
+                    const card = `
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">${produto.nome}</h5>
+                                    <p class="card-text">${produto.descricao}</p>
+                                    <p class="card-text"><strong>R$ ${parseFloat(produto.precoBase).toFixed(2)}</strong></p>
+                                </div>
+                                <div class="card-footer">
+                                    <a href="/Produtos/Details/${produto.id}" class="btn btn-sm btn-info">Detalhes</a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.innerHTML += card;
+                });
+            } catch (error) {
+                console.error('Erro ao carregar produtos:', error);
+                document.getElementById('produtosContainer').innerHTML = 
+                    '<p class="col-12 text-danger">Erro ao carregar produtos.</p>';
+            }
+        });
+    </script>
+}

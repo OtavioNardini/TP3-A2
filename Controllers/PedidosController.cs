@@ -1,18 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RestauranteAPP_TP3.Data;
 using RestauranteAPP_TP3.Models;
 
 namespace RestauranteAPP_TP3.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class PedidosController : ControllerBase
+    [Authorize]
+    public class PedidosController : Controller
     {
         private readonly ApplicationDbContext _context;
 
@@ -21,88 +23,151 @@ namespace RestauranteAPP_TP3.Controllers
             _context = context;
         }
 
-        // GET: api/Pedidos
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Pedido>>> GetPedidos()
+        // MVC: GET /Pedidos
+        public async Task<IActionResult> Index()
         {
-            return await _context.Pedidos.ToListAsync();
+            var pedidos = await _context.Pedidos
+                .Include(p => p.Usuario)
+                .Include(p => p.PedidoItens).ThenInclude(pi => pi.Produtos)
+                .ToListAsync();
+
+            return View(pedidos);
         }
 
-        // GET: api/Pedidos/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Pedido>> GetPedido(int id)
+        // MVC: GET /Pedidos/Create
+        public async Task<IActionResult> Create()
         {
+            ViewBag.Cardapio = await _context.ItensCardapio.ToListAsync();
+            return View();
+        }
+
+        // MVC: POST /Pedidos/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(IFormCollection form)
+        {
+            // require authenticated user to create an order
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+                return Challenge(); // redirect to login
+
+            var selected = form["CardapioItemIds"];
+            if (selected.Count == 0)
+            {
+                ModelState.AddModelError(string.Empty, "Escolha pelo menos um item do cardápio.");
+                ViewBag.Cardapio = await _context.ItensCardapio.ToListAsync();
+                return View();
+            }
+
+            var pedido = new Pedido
+            {
+                Data = DateTime.Now,
+                UsuarioId = userId,
+                PedidoItens = new List<PedidoItem>()
+            };
+
+            foreach (var sid in selected)
+            {
+                if (!int.TryParse(sid, out var prodId))
+                    continue;
+
+                var produto = await _context.ItensCardapio.FindAsync(prodId);
+                if (produto == null)
+                    continue;
+
+                var qString = form[$"Quantidades[{prodId}]"].FirstOrDefault() ?? "1";
+                if (!int.TryParse(qString, out var quantidade))
+                    quantidade = 1;
+                if (quantidade <= 0) quantidade = 1;
+
+                var pi = new PedidoItem
+                {
+                    ItemCardapioId = prodId,
+                    Quantidade = quantidade,
+                    PrecoUnitario = produto.PrecoBase
+                };
+                pedido.PedidoItens.Add(pi);
+            }
+
+            pedido.ValorTotal = pedido.PedidoItens.Sum(pi => pi.PrecoUnitario * pi.Quantidade);
+
+            _context.Pedidos.Add(pedido);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        // MVC: GET /Pedidos/Edit/5
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null) return NotFound();
+
             var pedido = await _context.Pedidos.FindAsync(id);
+            if (pedido == null) return NotFound();
 
-            if (pedido == null)
-            {
-                return NotFound();
-            }
-
-            return pedido;
+            ViewBag.UsuarioId = new SelectList(_context.Users, "Id", "Nome", pedido.UsuarioId);
+            return View(pedido);
         }
 
-        // PUT: api/Pedidos/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutPedido(int id, Pedido pedido)
+        // MVC: POST /Pedidos/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Data,UsuarioId,ValorTotal")] Pedido pedido)
         {
-            if (id != pedido.Id)
+            if (id != pedido.Id) return NotFound();
+            if (!ModelState.IsValid)
             {
-                return BadRequest();
+                ViewBag.UsuarioId = new SelectList(_context.Users, "Id", "Nome", pedido.UsuarioId);
+                return View(pedido);
             }
-
-            _context.Entry(pedido).State = EntityState.Modified;
 
             try
             {
+                _context.Update(pedido);
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!PedidoExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                if (!PedidoExists(pedido.Id)) return NotFound();
+                throw;
             }
 
-            return NoContent();
+            return RedirectToAction(nameof(Index));
         }
 
-        // POST: api/Pedidos
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        // MVC: POST /Pedidos/Delete/5  (called from a form in Index)
         [HttpPost]
-        public async Task<ActionResult<Pedido>> PostPedido(Pedido pedido)
-        {
-            _context.Pedidos.Add(pedido);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetPedido", new { id = pedido.Id }, pedido);
-        }
-
-        // DELETE: api/Pedidos/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePedido(int id)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
         {
             var pedido = await _context.Pedidos.FindAsync(id);
-            if (pedido == null)
+            if (pedido != null)
             {
-                return NotFound();
+                _context.Pedidos.Remove(pedido);
+                await _context.SaveChangesAsync();
             }
-
-            _context.Pedidos.Remove(pedido);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            return RedirectToAction(nameof(Index));
         }
 
-        private bool PedidoExists(int id)
+        // --- Explicit API endpoints (if any external JS/clients use them) ---
+        [HttpGet("/api/pedidos")]
+        public async Task<ActionResult<IEnumerable<Pedido>>> GetApiPedidos()
         {
-            return _context.Pedidos.Any(e => e.Id == id);
+            return await _context.Pedidos
+                .Include(p => p.PedidoItens).ThenInclude(pi => pi.Produtos)
+                .ToListAsync();
         }
+
+        [HttpGet("/api/pedidos/{id}")]
+        public async Task<ActionResult<Pedido>> GetApiPedido(int id)
+        {
+            var p = await _context.Pedidos
+                .Include(x => x.PedidoItens).ThenInclude(pi => pi.Produtos)
+                .FirstOrDefaultAsync(x => x.Id == id);
+            if (p == null) return NotFound();
+            return p;
+        }
+
+        private bool PedidoExists(int id) => _context.Pedidos.Any(e => e.Id == id);
     }
 }
