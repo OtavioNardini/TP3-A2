@@ -1,44 +1,128 @@
 ﻿@model RestauranteAPP_TP3.Models.Pedido
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Editar Pedido";
 }
 
-<h1>Edit</h1>
+<style>
+    .page-wrapper {
+        min-height: 100vh;
+        padding: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-<h4>Pedido</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    .form-card {
+        width: 100%;
+        max-width: 560px;
+        background: rgba(255,255,255,0.03);
+        border-radius: 12px;
+        padding: 1.5rem;
+        border: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .form-header {
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+
+    .form-title {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #0f172a;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .form-label {
+        display: block;
+        font-weight: 700;
+        margin-bottom: 0.35rem;
+        color: #374151;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 0.7rem 0.9rem;
+        border-radius: 8px;
+        border: 1px solid rgba(0,0,0,0.06);
+        background: white;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        justify-content: space-between;
+    }
+
+    .btn-save {
+        background: linear-gradient(135deg,#6366f1,#8b5cf6);
+        color: white;
+        padding: 0.6rem 0.9rem;
+        border-radius: 10px;
+        font-weight: 800;
+        border: none;
+    }
+
+    .btn-cancel {
+        background: rgba(0,0,0,0.06);
+        padding: 0.6rem 0.9rem;
+        border-radius: 10px;
+        color: #0f172a;
+        text-decoration: none;
+        font-weight: 700;
+    }
+</style>
+
+<div class="page-wrapper">
+    <div class="form-card">
+        <div class="form-header">
+            <div class="form-title">Editar Pedido #@Model.Id</div>
+            <div class="form-sub">Ajuste informações do pedido</div>
+        </div>
+
+        <form asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
             <input type="hidden" asp-for="Id" />
+
             <div class="form-group">
-                <label asp-for="Data" class="control-label"></label>
-                <input asp-for="Data" class="form-control" />
-                <span asp-validation-for="Data" class="text-danger"></span>
+                <label class="form-label">Data</label>
+                <input class="form-input" value="@Model.Data.ToString("g")" disabled />
             </div>
+
             <div class="form-group">
-                <label asp-for="UsuarioId" class="control-label"></label>
-                <select asp-for="UsuarioId" class="form-control" asp-items="ViewBag.UsuarioId"></select>
-                <span asp-validation-for="UsuarioId" class="text-danger"></span>
+                <label asp-for="UsuarioId" class="form-label"></label>
+                <select asp-for="UsuarioId" asp-items="(SelectList)ViewBag.UsuarioId" class="form-input"></select>
             </div>
+
             <div class="form-group">
-                <label asp-for="ValorTotal" class="control-label"></label>
-                <input asp-for="ValorTotal" class="form-control" />
+                <label asp-for="ValorTotal" class="form-label"></label>
+                <input asp-for="ValorTotal" class="form-input" />
                 <span asp-validation-for="ValorTotal" class="text-danger"></span>
             </div>
+
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <label asp-for="Status" class="form-label"></label>
+                <select asp-for="Status" class="form-input">
+                    <option value="">-- Selecionar --</option>
+                    <option value="EmAnalise">EmAnalise</option>
+                    <option value="Aprovado">Aprovado</option>
+                    <option value="Reprovado">Reprovado</option>
+                </select>
+            </div>
+
+            <div class="form-actions">
+                <a asp-action="Index" class="btn-cancel">Cancelar</a>
+                <button type="submit" class="btn-save">Salvar Alterações</button>
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @await Html.PartialAsync("_ValidationScriptsPartial")
 }

@@ -1,0 +1,168 @@
+﻿@model RestauranteAPP_TP3.Models.Pedido
+
+@{
+    ViewData["Title"] = "Detalhes do Pedido";
+}
+
+<style>
+    .detail-card {
+        max-width: 800px;
+        margin: 0 auto;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(0,0,0,0.06);
+        padding: 1.5rem;
+        border-radius: 12px;
+    }
+
+    .detail-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .detail-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .detail-sub {
+        color: #6b7280;
+    }
+
+    .items-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+    }
+
+        .items-table th, .items-table td {
+            padding: 0.6rem;
+            border-bottom: 1px solid rgba(0,0,0,0.04);
+            text-align: left;
+        }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: #fff;
+        padding: 0.5rem 0.75rem;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 700;
+    }
+
+    .btn-approve {
+        background: #10b981;
+        color: white;
+        padding: 0.45rem 0.6rem;
+        border-radius: 8px;
+        font-weight: 700;
+    }
+
+    .btn-reject {
+        background: #ef4444;
+        color: white;
+        padding: 0.45rem 0.6rem;
+        border-radius: 8px;
+        font-weight: 700;
+    }
+
+    .btn-edit {
+        background: #fbbf24;
+        color: #0f172a;
+        padding: 0.45rem 0.6rem;
+        border-radius: 8px;
+        font-weight: 700;
+    }
+
+    .btn-delete {
+        background: #ef4444;
+        color: white;
+        padding: 0.45rem 0.6rem;
+        border-radius: 8px;
+        font-weight: 700;
+    }
+</style>
+
+<div class="detail-card">
+    <div class="detail-header">
+        <div>
+            <div class="detail-title">Pedido #@Model.Id</div>
+            <div class="detail-sub">Feito por @Model.Usuario?.Nome ?? Model.UsuarioId — @Model.Data.ToString("g")</div>
+        </div>
+
+        <div style="display:flex; gap:0.5rem; align-items:center;">
+            <a asp-action="Index" class="btn-primary">← Voltar</a>
+
+            @* Show Approve/Reject to aprovador OR Admin, only when still in analysis *@
+            @if ((User.IsInRole("aprovador") || User.IsInRole("Admin")) && Model.Status == PedidoStatus.EmAnalise)
+            {
+                <form asp-action="Approve" asp-route-id="@Model.Id" method="post" style="display:inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn-approve">Aprovar</button>
+                </form>
+
+                <form asp-action="Reject" asp-route-id="@Model.Id" method="post" style="display:inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn-reject">Reprovar</button>
+                </form>
+            }
+
+            @* Edit/Delete para aprovador ou admin *@
+            @if (User.IsInRole("aprovador") || User.IsInRole("Admin"))
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn-edit">✏️ Editar</a>
+
+                <form asp-action="Delete" method="post" style="display:inline">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <button type="submit" class="btn-delete" onclick="return confirm('Excluir pedido #@Model.Id?')">🗑️ Excluir</button>
+                </form>
+            }
+        </div>
+    </div>
+
+    <h4>Itens</h4>
+    @if (Model.PedidoItens?.Any() == true)
+    {
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th>Quantidade</th>
+                    <th>Preço Unit.</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var pi in Model.PedidoItens)
+                {
+                    <tr>
+                        <td>@(pi.Produtos != null ? pi.Produtos.Nome : "")</td>
+                        <td>@pi.Quantidade</td>
+                        <td>R$ @pi.PrecoUnitario.ToString("F2")</td>
+                        <td>R$ @(pi.PrecoUnitario* pi.Quantidade).ToString("F2")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>Nenhum item encontrado para este pedido.</p>
+    }
+
+    <hr />
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+            <strong>Usuário:</strong> @Model.Usuario?.Nome ?? Model.UsuarioId<br />
+            <strong>Data:</strong> @Model.Data.ToString("g")
+        </div>
+        <div style="text-align:right">
+            <div style="font-size:1.1rem; font-weight:800">Total: R$ @Model.ValorTotal.ToString("F2")</div>
+            <div>Status: <span class="status-badge @(Model.Status == PedidoStatus.EmAnalise ? "status-emanalise" : Model.Status == PedidoStatus.Aprovado ? "status-aprovado" : "status-reprovado")">@Model.Status</span></div>
+        </div>
+    </div>
+</div>

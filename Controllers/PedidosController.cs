@@ -98,6 +98,7 @@ namespace RestauranteAPP_TP3.Controllers
         }
 
         // MVC: GET /Pedidos/Edit/5
+        [Authorize(Roles = "aprovador,Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -112,7 +113,8 @@ namespace RestauranteAPP_TP3.Controllers
         // MVC: POST /Pedidos/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Data,UsuarioId,ValorTotal")] Pedido pedido)
+        [Authorize(Roles = "aprovador,Admin")]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Data,UsuarioId,ValorTotal,Status")] Pedido pedido)
         {
             if (id != pedido.Id) return NotFound();
             if (!ModelState.IsValid)
@@ -138,6 +140,7 @@ namespace RestauranteAPP_TP3.Controllers
         // MVC: POST /Pedidos/Delete/5  (called from a form in Index)
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "aprovador,Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var pedido = await _context.Pedidos.FindAsync(id);
@@ -168,6 +171,71 @@ namespace RestauranteAPP_TP3.Controllers
             return p;
         }
 
-        private bool PedidoExists(int id) => _context.Pedidos.Any(e => e.Id == id);
+        // MVC: GET /Pedidos/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var pedido = await _context.Pedidos
+                .Include(p => p.Usuario)
+                .Include(p => p.PedidoItens).ThenInclude(pi => pi.Produtos)
+                .FirstOrDefaultAsync(p => p.Id == id);
+
+            if (pedido == null) return NotFound();
+            return View(pedido);
+        }
+
+        // MVC: POST /Pedidos/Approve/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "aprovador,Admin")]
+        public async Task<IActionResult> Approve(int id)
+        {
+            var pedido = await _context.Pedidos.FindAsync(id);
+            if (pedido == null) return NotFound();
+
+            pedido.Status = PedidoStatus.Aprovado; // adjust enum name if different
+            _context.Update(pedido);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        // MVC: POST /Pedidos/Reject/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "aprovador,Admin")]
+        public async Task<IActionResult> Reject(int id)
+        {
+            var pedido = await _context.Pedidos.FindAsync(id);
+            if (pedido == null) return NotFound();
+
+            pedido.Status = PedidoStatus.Reprovado; // adjust enum name if different
+            _context.Update(pedido);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        // MVC: POST /Pedidos/UpdateStatus/5  (generic status update from Details view)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "aprovador,Admin")]
+        public async Task<IActionResult> UpdateStatus(int id, PedidoStatus status)
+        {
+            var pedido = await _context.Pedidos.FindAsync(id);
+            if (pedido == null) return NotFound();
+
+            pedido.Status = status;
+            _context.Update(pedido);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        private bool PedidoExists(int id)
+        {
+            return _context.Pedidos.Any(e => e.Id == id);
+        }
     }
 }

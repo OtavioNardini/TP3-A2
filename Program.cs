@@ -22,6 +22,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
        options.UseSqlServer(connectionString));
 builder.Services.AddRefitClient<IViaCepIntegracaoRefit>().ConfigureHttpClient(c => c.BaseAddress = new Uri("https://viacep.com.br"));
 builder.Services.AddScoped<IViaCepIntegracao, ViaCepIntegracao>();
+builder.Services.AddRefitClient<IBrasilAPIIntegracaoRefit>().ConfigureHttpClient(c => c.BaseAddress = new Uri("https://brasilapi.com.br/api"));
+builder.Services.AddScoped<IBrasilAPIIntegracao, BrasilAPIIntegracao>();
 
 builder.Services.AddIdentity<Usuario, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -53,6 +55,8 @@ using (var scope = app.Services.CreateScope())
         var logger = services.GetRequiredService<ILogger<Program>>();
         logger.LogError(ex, "An error occurred while seeding identity data.");
     }
+
+   
 }
 
 // Configure the HTTP request pipeline.

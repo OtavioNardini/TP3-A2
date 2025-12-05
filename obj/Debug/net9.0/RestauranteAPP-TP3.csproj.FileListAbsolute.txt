@@ -440,4 +440,3 @@ C:\Users\otavi\source\repos\RestauranteAPP-TP3\RestauranteAPP-TP3\bin\Debug\net9
 C:\Users\otavi\source\repos\RestauranteAPP-TP3\RestauranteAPP-TP3\bin\Debug\net9.0\Microsoft.Extensions.Options.ConfigurationExtensions.dll
 C:\Users\otavi\source\repos\RestauranteAPP-TP3\RestauranteAPP-TP3\bin\Debug\net9.0\Refit.dll
 C:\Users\otavi\source\repos\RestauranteAPP-TP3\RestauranteAPP-TP3\bin\Debug\net9.0\Refit.HttpClientFactory.dll
-C:\Users\otavi\source\repos\RestauranteAPP-TP3\RestauranteAPP-TP3\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt

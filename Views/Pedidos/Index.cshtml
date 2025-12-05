@@ -1,47 +1,268 @@
 ﻿@model IEnumerable<RestauranteAPP_TP3.Models.Pedido>
 
 @{
-    ViewData["Title"] = "Lista de Pedidos";
+    ViewData["Title"] = "Pedidos";
 }
 
-<h2>Lista de Pedidos</h2>
-<hr />
+<style>
+    .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Data</th>
-            <th>Cliente</th>
-            <th>Itens</th>
-            <th>Valor Total</th>
-            <th>Ações</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var pedido in Model)
-        {
-            <tr>
-                <td>@pedido.Data</td>
-                <td>@pedido.Usuario?.Nome</td>
-                <td>
-                    <ul>
-                        @foreach (var pi in pedido.PedidoItens)
-                        {
-                            <li>@pi.Produtos?.Nome (Qtd: @pi.Quantidade)</li>
-                        }
-                    </ul>
-                </td>
-                <td>@pedido.ValorTotal.ToString("C")</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@pedido.Id" class="btn btn-sm btn-primary">Editar</a>
-                    <form asp-action="Delete" asp-route-id="@pedido.Id" method="post" class="d-inline">
-                        @Html.AntiForgeryToken()
-                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Confirma exclusão deste pedido?');">Excluir</button>
-                    </form>
-                </td>
-            </tr>
+        .page-header h1 {
+            margin: 0;
+            font-size: 1.75rem;
+            color: #0f172a;
         }
-    </tbody>
-</table>
 
-<a asp-action="Create" class="btn btn-success">Novo Pedido</a>
+    .btn-manage-roles {
+        background: #ef4444;
+        color: white;
+        padding: 0.5rem 0.75rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        margin-right: 0.5rem;
+    }
+
+    .btn-create {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: #fff;
+        padding: 0.6rem 0.9rem;
+        border-radius: 10px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 700;
+    }
+
+    .table-container {
+        background: rgba(255,255,255,0.03);
+        border-radius: 12px;
+        padding: 1rem;
+        border: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .products-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .products-table th, .products-table td {
+            padding: 0.75rem 0.5rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(0,0,0,0.04);
+        }
+
+    .pedido-id {
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .pedido-user {
+        color: #374151;
+    }
+
+    .pedido-total {
+        font-weight: 700;
+        color: #059669;
+    }
+
+    .actions-cell {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .btn-action {
+        padding: 0.4rem 0.6rem;
+        border-radius: 8px;
+        text-decoration: none;
+        color: inherit;
+        font-weight: 600;
+    }
+
+    .btn-edit {
+        background: #fbbf24;
+        color: #0f172a;
+    }
+
+    .btn-delete {
+        background: #ef4444;
+        color: white;
+    }
+
+    .btn-details {
+        background: #e2e8f0;
+        color: #0f172a;
+    }
+
+    .btn-approve {
+        background: #10b981;
+        color: white;
+        padding: 0.35rem 0.55rem;
+        border-radius: 8px;
+        font-weight: 700;
+    }
+
+    .btn-reject {
+        background: #ef4444;
+        color: white;
+        padding: 0.35rem 0.55rem;
+        border-radius: 8px;
+        font-weight: 700;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 2rem;
+        color: #6b7280;
+    }
+
+    .text-muted {
+        color: #9ca3af;
+        font-weight: 600;
+    }
+
+    .status-badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 0.85rem;
+    }
+
+    .status-emanalise {
+        background: #f3f4f6;
+        color: #374151;
+    }
+
+    .status-aprovado {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .status-reprovado {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+</style>
+
+<div class="page-header">
+    <h1>Pedidos</h1>
+
+    <div>
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-controller="Roles" asp-action="Index" class="btn-manage-roles">Gerenciar Roles</a>
+        }
+
+        @if (User.Identity.IsAuthenticated)
+        {
+            <a asp-action="Create" class="btn-create">➕ Novo Pedido</a>
+        }
+    </div>
+</div>
+
+<div class="table-container">
+    @if (Model != null && Model.Any())
+    {
+        <table class="products-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Usuário</th>
+                    <th>Data</th>
+                    <th>Valor Total</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var pedido in Model)
+                {
+                    <tr>
+                        <td class="pedido-id">@pedido.Id</td>
+                        <td class="pedido-user">@pedido.Usuario?.Nome ?? pedido.UsuarioId</td>
+                        <td>@pedido.Data.ToString("g")</td>
+                        <td class="pedido-total">R$ @pedido.ValorTotal.ToString("F2")</td>
+                        <td>
+                            <span class="status-badge @(pedido.Status == PedidoStatus.EmAnalise ? "status-emanalise" : pedido.Status == PedidoStatus.Aprovado ? "status-aprovado" : "status-reprovado")">
+                                @pedido.Status
+                            </span>
+                        </td>
+                        <td>
+                            <div class="actions-cell">
+                                <a asp-action="Details" asp-route-id="@pedido.Id" class="btn-action btn-details">🔍 Detalhes</a>
+
+                                @* Approve/Reject visible to aprovador OR Admin when still in analysis *@
+                                @if ((User.IsInRole("aprovador") || User.IsInRole("Admin")) && pedido.Status == PedidoStatus.EmAnalise)
+                                {
+                                    <form asp-action="Approve" asp-route-id="@pedido.Id" method="post" style="display:inline">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn-approve">Aprovar</button>
+                                    </form>
+
+                                    <form asp-action="Reject" asp-route-id="@pedido.Id" method="post" style="display:inline">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn-reject">Reprovar</button>
+                                    </form>
+                                }
+
+                                @* Edit/Delete visíveis somente para aprovador ou Admin *@
+                                @if (User.IsInRole("aprovador") || User.IsInRole("Admin"))
+                                {
+                                    <a asp-action="Edit" asp-route-id="@pedido.Id" class="btn-action btn-edit">✏️ Editar</a>
+
+                                    <form asp-action="Delete" method="post" style="display:inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@pedido.Id" />
+                                        <button type="submit" class="btn-action btn-delete" onclick="return confirm('Excluir pedido #@pedido.Id?')">🗑️ Excluir</button>
+                                    </form>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <p class="empty-state-text">Nenhum pedido encontrado.</p>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <a asp-action="Create" class="btn-create">+ Fazer Primeiro Pedido</a>
+            }
+        </div>
+    }
+</div>
+
+@using System.Security.Claims
+
+<div class="debug-user" style="margin-bottom:0.75rem;padding:0.5rem;border-radius:8px;background:rgba(99,102,241,0.06);font-size:0.9rem;">
+    <strong>Usuário:</strong> @(User.Identity?.Name ?? "(não autenticado)") <br />
+    <strong>Autenticado:</strong> @(User.Identity?.IsAuthenticated == true ? "Sim" : "Não") <br />
+    <strong>Roles (claims):</strong>
+    @{
+        var roleClaims = User.Claims
+        .Where(c => c.Type == ClaimTypes.Role || c.Type == "role" || c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role")
+        .Select(c => c.Value)
+        .ToArray();
+    }
+    @if (roleClaims.Any())
+    {
+        <span>@string.Join(", ", roleClaims)</span>
+    }
+    else
+    {
+        <span>— (nenhuma role encontrada no cookie)</span>
+    }
+</div>

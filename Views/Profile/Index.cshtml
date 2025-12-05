@@ -4,15 +4,45 @@
     ViewData["Title"] = "Perfil";
 }
 
-<!-- DEBUG MARKER: remove after troubleshooting -->
-<div style="padding:1rem; color:crimson; font-weight:700;">DEBUG: Profile view rendered</div>
-
 <h1>Perfil do Usuário</h1>
 
 <div class="card p-4 mb-4">
     <h4>@Model.User.Nome</h4>
     <p><strong>Email:</strong> @Model.User.Email</p>
     <p><strong>Username:</strong> @Model.User.UserName</p>
+
+    <div class="mb-3">
+        <form asp-action="UpdateCnpj" method="post" class="row g-2 align-items-center">
+            @Html.AntiForgeryToken()
+            <div class="col-auto">
+                <label class="form-label mb-0" for="cnpjInput"><strong>CNPJ:</strong></label>
+            </div>
+            <div class="col-auto" style="min-width:220px; display:flex; align-items:center; gap:.5rem;">
+                <input id="cnpjInput" name="cnpj" value="@(Model.User.CNPJ ?? string.Empty)" class="form-control" />
+                @* validation icon/message *@
+                @if (Model.CnpjIsValid == true)
+                {
+                    <span class="text-success" title="@Model.CnpjValidationMessage">?</span>
+                }
+                else if (Model.CnpjIsValid == false && !string.IsNullOrEmpty(Model.CnpjValidationMessage))
+                {
+                    <span class="text-danger" title="@Model.CnpjValidationMessage">?</span>
+                }
+            </div>
+            <div class="col-12">
+                @if (!string.IsNullOrEmpty(Model.CnpjValidationMessage))
+                {
+                    <div class="small mt-1 @(Model.CnpjIsValid == true ? "text-success" : "text-danger")">
+                        @Model.CnpjValidationMessage
+                    </div>
+                }
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">Salvar CNPJ</button>
+            </div>
+        </form>
+        <div class="text-muted small mt-1">Informe apenas números ou formato com pontuação — serão normalizados.</div>
+    </div>
 
     <a asp-controller="Enderecoes" asp-action="Create" class="btn btn-primary">Adicionar Endereço</a>
 </div>
@@ -32,7 +62,7 @@
                     <td>@e.Cidade</td>
                     <td>@e.CEP</td>
                     <td>
-                        <a asp-controller="Enderecoes" asp-action="Edit" asp-route-id="@e.Id">Editar</a>|
+                        <a asp-controller="Enderecoes" asp-action="Edit" asp-route-id="@e.Id">Editar</a> |
                         <a asp-controller="Enderecoes" asp-action="Details" asp-route-id="@e.Id">Details</a> |
                         <a asp-controller="Enderecoes" asp-action="Delete" asp-route-id="@e.Id">Delete</a>
                     </td>
@@ -44,4 +74,8 @@
 else
 {
     <p>Nenhum endereço cadastrado ainda.</p>
+}
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

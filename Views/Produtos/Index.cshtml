@@ -34,229 +34,109 @@
 
     .page-header {
         display: flex;
+            align-items: center;
         justify-content: space-between;
-        align-items: center;
-        margin-bottom: 2rem;
-        padding: 2rem 0;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
     }
 
-    .page-title {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: var(--text-light);
+    .page-header h1 {
         margin: 0;
+        font-size: 1.75rem;
+        color: #0f172a;
     }
 
-    .page-subtitle {
-        color: var(--text-muted);
-        margin-top: 0.5rem;
+    .btn-manage-roles {
+        background: #ef4444;
+        color: white;
+        padding: 0.5rem 0.75rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        margin-right: 0.5rem;
     }
 
     .btn-create {
-        background: linear-gradient(135deg, var(--primary), #8b5cf6);
-        color: white;
-        padding: 0.875rem 1.75rem;
-        border-radius: 12px;
-        font-weight: 600;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: #fff;
+        padding: 0.6rem 0.9rem;
+        border-radius: 10px;
         text-decoration: none;
-        transition: all 0.3s ease;
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+        font-weight: 700;
     }
 
-        .btn-create:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4);
-            color: white;
-        }
-
     .table-container {
-        background: var(--card-bg);
-        backdrop-filter: blur(10px);
-        border: 1px solid var(--card-border);
-        border-radius: 16px;
-        overflow: hidden;
+        background: rgba(255,255,255,0.03);
+        border-radius: 12px;
+        padding: 1rem;
+        border: 1px solid rgba(0,0,0,0.06);
     }
 
     .products-table {
         width: 100%;
         border-collapse: collapse;
-        margin: 0;
     }
 
-        .products-table thead {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .products-table th {
-            color: var(--text-muted);
-            font-weight: 600;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 1rem 1.5rem;
-            text-align: left;
-            border-bottom: 1px solid var(--card-border);
-        }
-
-        .products-table td {
-            padding: 1.25rem 1.5rem;
-            color: var(--text-light);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            vertical-align: middle;
-        }
-
-        .products-table tbody tr {
-            transition: all 0.2s ease;
-        }
-
-            .products-table tbody tr:hover {
-                background: rgba(255, 255, 255, 0.05);
-            }
-
-            .products-table tbody tr:last-child td {
-                border-bottom: none;
-            }
+    .products-table th, .products-table td {
+        padding: 0.75rem 0.5rem;
+        text-align: left;
+        border-bottom: 1px solid rgba(0,0,0,0.04);
+    }
 
     .product-name {
         font-weight: 600;
-        font-size: 1rem;
+        color: #0f172a;
     }
 
     .product-desc {
-        color: var(--text-muted);
-        font-size: 0.875rem;
-        max-width: 300px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        color: #374151;
     }
 
     .product-price {
-        color: var(--success);
         font-weight: 700;
-        font-size: 1.1rem;
+        color: #059669;
     }
 
     .actions-cell {
         display: flex;
         gap: 0.5rem;
+        align-items: center;
     }
 
     .btn-action {
-        padding: 0.5rem 1rem;
+        padding: 0.4rem 0.6rem;
         border-radius: 8px;
-        font-size: 0.8rem;
-        font-weight: 500;
         text-decoration: none;
-        transition: all 0.2s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.25rem;
+        color: inherit;
+        font-weight: 600;
     }
 
     .btn-edit {
-        background: rgba(99, 102, 241, 0.15);
-        color: #a5b4fc;
-        border: 1px solid rgba(99, 102, 241, 0.3);
+        background: #fbbf24;
+        color: #0f172a;
     }
-
-        .btn-edit:hover {
-            background: var(--primary);
-            color: white;
-        }
 
     .btn-delete {
-        background: rgba(239, 68, 68, 0.15);
-        color: #fca5a5;
-        border: 1px solid rgba(239, 68, 68, 0.3);
+        background: #ef4444;
+        color: white;
     }
-
-        .btn-delete:hover {
-            background: var(--danger);
-            color: white;
-        }
 
     .empty-state {
         text-align: center;
-        padding: 4rem 2rem;
-        color: var(--text-muted);
+        padding: 2rem;
+        color: #6b7280;
     }
 
-    .empty-state-icon {
-        font-size: 4rem;
-        margin-bottom: 1rem;
-        opacity: 0.5;
+    .empty-state .btn-create {
+        margin-top: 1rem;
     }
 
-    .empty-state-text {
-        font-size: 1.1rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .search-bar {
-        display: flex;
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .search-input {
-        flex: 1;
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid var(--card-border);
-        border-radius: 12px;
-        padding: 0.875rem 1.25rem;
-        color: var(--text-light);
-        font-size: 0.95rem;
-        transition: all 0.2s ease;
-    }
-
-        .search-input::placeholder {
-            color: var(--text-muted);
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-    .stats-bar {
-        display: flex;
-        gap: 1.5rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .stat-badge {
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid var(--card-border);
-        border-radius: 10px;
-        padding: 0.75rem 1.25rem;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-
-    .stat-badge-icon {
-        font-size: 1.25rem;
-    }
-
-    .stat-badge-info {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .stat-badge-value {
-        color: var(--text-light);
-        font-weight: 700;
-        font-size: 1.1rem;
-    }
-
-    .stat-badge-label {
-        color: var(--text-muted);
-        font-size: 0.75rem;
+    .text-muted {
+        color: #9ca3af;
+        font-weight: 600;
     }
 
     @@media (max-width: 768px) {
@@ -289,13 +169,23 @@
     <div class="page-container">
         <!-- Header -->
         <div class="page-header">
+            <h1>Produtos</h1>
+
             <div>
-                <h1 class="page-title">📦 Catálogo de Produtos</h1>
-                <p class="page-subtitle">Gerencie todos os produtos cadastrados na plataforma</p>
+                @* Link para gerenciamento de roles (visível apenas para Admin) *@
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-controller="Roles" asp-action="Index" class="btn-manage-roles">Gerenciar Roles</a>
+                }
+
+                @* Mostrar "Novo Produto" apenas para Fornecedor ou Admin *@
+                @if (User.IsInRole("Fornecedor") || User.IsInRole("Admin"))
+                {
+                    <a asp-action="Create" class="btn-create">
+                        <span>+</span> Novo Produto
+                    </a>
+                }
             </div>
-            <a asp-action="Create" class="btn-create">
-                <span>+</span> Novo Produto
-            </a>
         </div>
 
         <!-- Stats -->
@@ -323,7 +213,7 @@
 
         <!-- Table -->
         <div class="table-container">
-            @if (Model.Any())
+            @if (Model != null && Model.Any())
             {
                 <table class="products-table">
                     <thead>
@@ -349,12 +239,20 @@
                                 </td>
                                 <td>
                                     <div class="actions-cell">
-                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn-action btn-edit">
-                                            ✏️ Editar
-                                        </a>
-                                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn-action btn-delete">
-                                            🗑️ Excluir
-                                        </a>
+                                        @* Edit/Delete visíveis somente para Fornecedor ou Admin *@
+                                        @if (User.IsInRole("Fornecedor") || User.IsInRole("Admin"))
+                                        {
+                                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn-action btn-edit" title="Editar">
+                                                ✏️ Editar
+                                            </a>
+                                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn-action btn-delete" title="Excluir">
+                                                🗑️ Excluir
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Sem permissão</span>
+                                        }
                                     </div>
                                 </td>
                             </tr>
@@ -367,7 +265,10 @@
                 <div class="empty-state">
                     <div class="empty-state-icon">📭</div>
                     <p class="empty-state-text">Nenhum produto cadastrado ainda.</p>
-                    <a asp-action="Create" class="btn-create">+ Cadastrar Primeiro Produto</a>
+                    @if (User.IsInRole("Fornecedor") || User.IsInRole("Admin"))
+                    {
+                        <a asp-action="Create" class="btn-create">+ Cadastrar Primeiro Produto</a>
+                    }
                 </div>
             }
         </div>

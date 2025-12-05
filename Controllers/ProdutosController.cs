@@ -9,7 +9,6 @@ using RestauranteAPP_TP3.Models;
 
 namespace RestauranteAPP_TP3.Controllers
 {
-    [AllowAnonymous]
     public class ProdutosController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -20,6 +19,7 @@ namespace RestauranteAPP_TP3.Controllers
         }
 
         // MVC: GET /Produtos
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             var itens = await _context.ItensCardapio.ToListAsync();
@@ -27,6 +27,7 @@ namespace RestauranteAPP_TP3.Controllers
         }
 
         // MVC: GET /Produtos/Details/5
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
@@ -36,11 +37,13 @@ namespace RestauranteAPP_TP3.Controllers
         }
 
         // MVC: GET /Produtos/Create
+        [Authorize(Roles = "Fornecedor,Admin")]
         public IActionResult Create() => View();
 
         // MVC: POST /Produtos/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Fornecedor,Admin")]
         public async Task<IActionResult> Create([Bind("Nome,Descricao,PrecoBase")] Produtos produtos)
         {
             if (ModelState.IsValid)
@@ -53,6 +56,7 @@ namespace RestauranteAPP_TP3.Controllers
         }
 
         // MVC: GET /Produtos/Edit/5
+        [Authorize(Roles = "Fornecedor,Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -64,6 +68,7 @@ namespace RestauranteAPP_TP3.Controllers
         // MVC: POST /Produtos/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Fornecedor,Admin")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Descricao,PrecoBase")] Produtos produtos)
         {
             if (id != produtos.Id) return NotFound();
@@ -84,6 +89,7 @@ namespace RestauranteAPP_TP3.Controllers
         }
 
         // MVC: GET /Produtos/Delete/5
+        [Authorize(Roles = "Fornecedor,Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -95,6 +101,7 @@ namespace RestauranteAPP_TP3.Controllers
         // MVC: POST /Produtos/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Fornecedor,Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var produto = await _context.ItensCardapio.FindAsync(id);
@@ -108,12 +115,14 @@ namespace RestauranteAPP_TP3.Controllers
 
         // --- Explicit API endpoints (keep these for Home fetch / JS) ---
         [HttpGet("/api/produtos")]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<Produtos>>> GetApiProdutos()
         {
             return await _context.ItensCardapio.ToListAsync();
         }
 
         [HttpGet("/api/produtos/{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult<Produtos>> GetApiProduto(int id)
         {
             var p = await _context.ItensCardapio.FindAsync(id);
@@ -122,6 +131,7 @@ namespace RestauranteAPP_TP3.Controllers
         }
 
         [HttpPost("/api/produtos")]
+        [Authorize(Roles = "Fornecedor,Admin")]
         public async Task<ActionResult<Produtos>> PostApiProduto(Produtos produtos)
         {
             _context.ItensCardapio.Add(produtos);
@@ -130,6 +140,7 @@ namespace RestauranteAPP_TP3.Controllers
         }
 
         [HttpPut("/api/produtos/{id}")]
+        [Authorize(Roles = "Fornecedor,Admin")]
         public async Task<IActionResult> PutApiProduto(int id, Produtos produtos)
         {
             if (id != produtos.Id) return BadRequest();
@@ -147,6 +158,7 @@ namespace RestauranteAPP_TP3.Controllers
         }
 
         [HttpDelete("/api/produtos/{id}")]
+        [Authorize(Roles = "Fornecedor,Admin")]
         public async Task<IActionResult> DeleteApiProduto(int id)
         {
             var prod = await _context.ItensCardapio.FindAsync(id);

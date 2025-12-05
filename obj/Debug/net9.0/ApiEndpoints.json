@@ -24,5 +24,31 @@
         "StatusCode": 200
       }
     ]
+  },
+  {
+    "ContainingType": "RestauranteAPP_TP3.Controllers.CNPJController",
+    "Method": "ListarDadosEdere\u00E7o",
+    "RelativePath": "api/CNPJ/{cnpj}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "cnpj",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "RestauranteAPP_TP3.Integra\u00E7\u00E3o.Response.BrasilAPIResponse",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
   }
 ]
