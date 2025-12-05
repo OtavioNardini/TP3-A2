@@ -1,4 +1,5 @@
 ﻿@model RestauranteAPP_TP3.Models.Endereco
+@using System.Security.Claims
 
 @{
     ViewData["Title"] = "Cadastrar Endereço";
@@ -15,34 +16,79 @@
             <div asp-validation-summary="All" class="text-danger"></div>
 
             <div class="form-group">
+                <label asp-for="CEP" class="control-label"></label>
+                <input asp-for="CEP" id="cepInput" class="form-control" />
+                <small id="cepFeedback" class="text-danger" style="display:none;"></small>
+                <span asp-validation-for="CEP" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
                 <label asp-for="Rua" class="control-label"></label>
-                <input asp-for="Rua" class="form-control" />
+                <input asp-for="Rua" id="ruaInput" class="form-control" />
                 <span asp-validation-for="Rua" class="text-danger"></span>
             </div>
 
             <div class="form-group">
                 <label asp-for="Cidade" class="control-label"></label>
-                <input asp-for="Cidade" class="form-control" />
+                <input asp-for="Cidade" id="cidadeInput" class="form-control" />
                 <span asp-validation-for="Cidade" class="text-danger"></span>
             </div>
 
-            <div class="form-group">
-                <label asp-for="CEP" class="control-label"></label>
-                <input asp-for="CEP" class="form-control" />
-                <span asp-validation-for="CEP" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
+            <div class="form-group mt-3">
                 <input type="submit" value="Cadastrar" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Voltar para Lista</a>
-</div>
+
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        (function () {
+            const cepEl = document.getElementById('cepInput');
+            const ruaEl = document.getElementById('ruaInput');
+            const cidadeEl = document.getElementById('cidadeInput');
+            const feedback = document.getElementById('cepFeedback');
+
+            async function lookupCep(raw) {
+                feedback.style.display = 'none';
+                const cep = (raw || '').replace(/\D/g, '');
+                if (cep.length !== 8) {
+                    feedback.textContent = 'Informe um CEP válido (8 dígitos).';
+                    feedback.style.display = 'block';
+                    return;
+                }
+
+                try {
+                    feedback.style.display = 'none';
+                    const res = await fetch(`/api/cep/${cep}`);
+                    if (!res.ok) {
+                        feedback.textContent = 'CEP não encontrado.';
+                        feedback.style.display = 'block';
+                        return;
+                    }
+                    const data = await res.json();
+
+                    ruaEl.value = data.logradouro ?? data.Logradouro ?? '';
+                    cidadeEl.value = data.localidade ?? data.Localidade ?? '';
+                    cepEl.value = data.cep ?? cep;
+                } catch (err) {
+                    feedback.textContent = 'Erro ao consultar CEP.';
+                    feedback.style.display = 'block';
+                    console.error(err);
+                }
+            }
+
+            cepEl.addEventListener('blur', e => lookupCep(e.target.value));
+            cepEl.addEventListener('keydown', e => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    lookupCep(cepEl.value);
+                }
+            });
+        })();
+    </script>
 }

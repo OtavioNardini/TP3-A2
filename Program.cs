@@ -5,6 +5,10 @@ using RestauranteAPP_TP3.Customs;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using RestauranteAPP_TP3.Models;
 using Microsoft.Extensions.Logging;
+using Refit;
+using RestauranteAPP_TP3.Integração.Refit;
+using RestauranteAPP_TP3.Integração;
+using RestauranteAPP_TP3.Integração.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +20,8 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
        options.UseSqlServer(connectionString));
+builder.Services.AddRefitClient<IViaCepIntegracaoRefit>().ConfigureHttpClient(c => c.BaseAddress = new Uri("https://viacep.com.br"));
+builder.Services.AddScoped<IViaCepIntegracao, ViaCepIntegracao>();
 
 builder.Services.AddIdentity<Usuario, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<ApplicationDbContext>()

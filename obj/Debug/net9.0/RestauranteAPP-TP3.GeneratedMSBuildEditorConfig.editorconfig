@@ -1,4 +1,5 @@
 is_global = true
+build_property.RefitInternalNamespace = RestauranteAPP_TP3
 build_property.TargetFramework = net9.0
 build_property.TargetFramework = net9.0
 build_property.TargetPlatformMinVersion = 
@@ -118,6 +119,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/otavi/source/repos/RestauranteAPP-TP3/RestauranteAPP-TP3/Views/Produtos/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvZHV0b3NcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/otavi/source/repos/RestauranteAPP-TP3/RestauranteAPP-TP3/Views/Profile/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvZmlsZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/otavi/source/repos/RestauranteAPP-TP3/RestauranteAPP-TP3/Views/Shared/Error.cshtml]

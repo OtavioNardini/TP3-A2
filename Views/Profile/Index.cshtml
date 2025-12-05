@@ -1,0 +1,47 @@
+@model RestauranteAPP_TP3.Models.ProfileViewModel
+
+@{
+    ViewData["Title"] = "Perfil";
+}
+
+<!-- DEBUG MARKER: remove after troubleshooting -->
+<div style="padding:1rem; color:crimson; font-weight:700;">DEBUG: Profile view rendered</div>
+
+<h1>Perfil do Usuário</h1>
+
+<div class="card p-4 mb-4">
+    <h4>@Model.User.Nome</h4>
+    <p><strong>Email:</strong> @Model.User.Email</p>
+    <p><strong>Username:</strong> @Model.User.UserName</p>
+
+    <a asp-controller="Enderecoes" asp-action="Create" class="btn btn-primary">Adicionar Endereço</a>
+</div>
+
+@if (Model.Enderecos.Any())
+{
+    <h3>Meus Endereços</h3>
+    <table class="table">
+        <thead>
+            <tr><th>Rua</th><th>Cidade</th><th>CEP</th><th></th></tr>
+        </thead>
+        <tbody>
+            @foreach (var e in Model.Enderecos)
+            {
+                <tr>
+                    <td>@e.Rua</td>
+                    <td>@e.Cidade</td>
+                    <td>@e.CEP</td>
+                    <td>
+                        <a asp-controller="Enderecoes" asp-action="Edit" asp-route-id="@e.Id">Editar</a>|
+                        <a asp-controller="Enderecoes" asp-action="Details" asp-route-id="@e.Id">Details</a> |
+                        <a asp-controller="Enderecoes" asp-action="Delete" asp-route-id="@e.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Nenhum endereço cadastrado ainda.</p>
+}

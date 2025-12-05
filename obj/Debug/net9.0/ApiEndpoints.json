@@ -1,1 +1,28 @@
-[]
+[
+  {
+    "ContainingType": "RestauranteAPP_TP3.Controllers.CepController",
+    "Method": "ListarDadosEdere\u00E7o",
+    "RelativePath": "api/Cep/{cep}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "cep",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "RestauranteAPP_TP3.Integra\u00E7\u00E3o.Response.ViaCepResponse",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  }
+]

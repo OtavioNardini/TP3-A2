@@ -73,7 +73,7 @@ namespace RestauranteAPP_TP3.Controllers
 
             _context.Enderecos.Add(endereco);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index","Profile");
         }
 
         // GET: Enderecoes/Edit/5
@@ -98,7 +98,6 @@ namespace RestauranteAPP_TP3.Controllers
             // preserve UsuarioId and rebuild object to validate cleanly
             var endereco = new Endereco
             {
-                Id = id,
                 Rua = input.Rua?.Trim(),
                 Cidade = input.Cidade?.Trim(),
                 CEP = input.CEP?.Trim(),
@@ -121,7 +120,7 @@ namespace RestauranteAPP_TP3.Controllers
                 throw;
             }
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index", "Profile");
         }
 
         // GET: Enderecoes/Delete/5
@@ -143,7 +142,7 @@ namespace RestauranteAPP_TP3.Controllers
             var endereco = await _context.Enderecos.FindAsync(id);
             if (endereco != null) _context.Enderecos.Remove(endereco);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index", "Profile");
         }
 
         private bool EnderecoExists(int id) => _context.Enderecos.Any(e => e.Id == id);

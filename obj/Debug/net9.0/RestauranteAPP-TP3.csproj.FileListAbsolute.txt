@@ -432,3 +432,11 @@ C:\Users\otavi\source\repos\RestauranteAPP-TP3\RestauranteAPP-TP3\bin\Debug\net9
 C:\Users\otavi\source\repos\RestauranteAPP-TP3\RestauranteAPP-TP3\bin\Debug\net9.0\runtimes\win-x64\native\e_sqlite3.dll
 C:\Users\otavi\source\repos\RestauranteAPP-TP3\RestauranteAPP-TP3\bin\Debug\net9.0\runtimes\win-x86\native\e_sqlite3.dll
 C:\Users\otavi\source\repos\RestauranteAPP-TP3\RestauranteAPP-TP3\obj\Debug\net9.0\RestauranteAPP-TP3.sourcelink.json
+C:\Users\otavi\source\repos\RestauranteAPP-TP3\RestauranteAPP-TP3\bin\Debug\net9.0\Microsoft.Extensions.Configuration.dll
+C:\Users\otavi\source\repos\RestauranteAPP-TP3\RestauranteAPP-TP3\bin\Debug\net9.0\Microsoft.Extensions.Configuration.Binder.dll
+C:\Users\otavi\source\repos\RestauranteAPP-TP3\RestauranteAPP-TP3\bin\Debug\net9.0\Microsoft.Extensions.Diagnostics.dll
+C:\Users\otavi\source\repos\RestauranteAPP-TP3\RestauranteAPP-TP3\bin\Debug\net9.0\Microsoft.Extensions.Diagnostics.Abstractions.dll
+C:\Users\otavi\source\repos\RestauranteAPP-TP3\RestauranteAPP-TP3\bin\Debug\net9.0\Microsoft.Extensions.Http.dll
+C:\Users\otavi\source\repos\RestauranteAPP-TP3\RestauranteAPP-TP3\bin\Debug\net9.0\Microsoft.Extensions.Options.ConfigurationExtensions.dll
+C:\Users\otavi\source\repos\RestauranteAPP-TP3\RestauranteAPP-TP3\bin\Debug\net9.0\Refit.dll
+C:\Users\otavi\source\repos\RestauranteAPP-TP3\RestauranteAPP-TP3\bin\Debug\net9.0\Refit.HttpClientFactory.dll
